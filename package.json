@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "lint": "eslint . --cache --fix",
+    "prettier": "prettier --parser flow --config ./.prettierrc.json --write **/**/*.js  **/*.js *.js",
+    "test": "eslint ."
+  },
+  "dependencies": {
+    "body-parser": "^1.10.2",
+    "crypto-js": "^4.0.0",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3"
+  },
+  "devDependencies": {
+    "ajv": "^6.12.3",
+    "eslint": "^7.5.0",
+    "eslint-config-tamia": "^7.2.5",
+    "eslint-plugin-prettier": "^3.1.4",
+    "memfs": "3.2.0",
+    "prettier": "^2.0.5"
+  }
+}

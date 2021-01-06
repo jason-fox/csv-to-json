@@ -22,7 +22,7 @@ const upload = (req, res) => {
             .on('end', () => {
                 console.error(records);
             });
-        return records;
+        return res.status(204).send();
 
     } catch (error) {
         console.log(error);

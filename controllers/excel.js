@@ -14,8 +14,6 @@ const upload =  (req, res) => {
         readXlsxFile(path).then((rows) => {
             // skip header
             rows.shift();
-
-
             rows.forEach((row) => {
                 const record = {
                     id: row[0],
@@ -23,14 +21,13 @@ const upload =  (req, res) => {
                     description: row[2],
                     published: row[3]
                 };
-
                 records.push(record);
             });
 
             console.error(records);
             
         });
-        return records;
+        return res.status(204).send();
     } catch (error) {
         console.log(error);
         return res.status(500).send({

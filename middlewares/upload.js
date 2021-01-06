@@ -1,20 +1,23 @@
 const multer = require("multer");
 
-const csvFilter = (req, file, cb) => {
-  if (file.mimetype.includes("csv")) {
-    cb(null, true);
+const csvFilter = (req, file, callback) => {
+  if (file.mimetype.includes("csv") ||
+    file.mimetype.includes("excel") ||
+    file.mimetype.includes("spreadsheetml")
+    ) {
+    callback(null, true);
   } else {
-    cb("Please upload only csv file.", false);
+    callback("Please upload only csv and excel file.", false);
   }
 };
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, __basedir + "/resources/static/assets/uploads/");
+  destination: (req, file, callback) => {
+    callback(null, __basedir + "/resources/static/assets/uploads/");
   },
-  filename: (req, file, cb) => {
+  filename: (req, file, callback) => {
     console.log(file.originalname);
-    cb(null, `${Date.now()}-bezkoder-${file.originalname}`);
+    callback(null, `${Date.now()}-bezkoder-${file.originalname}`);
   },
 });
 

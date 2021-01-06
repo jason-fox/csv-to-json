@@ -1,22 +1,15 @@
 const createError = require('http-errors');
 const express = require('express');
-const bodyParser = require('body-parser');
-const PEPRouter = require('./routes/pep');
+const Router = require('./routes/routes');
 
 const app = express();
 
+global.__basedir = __dirname;
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/', Router);
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.use('/', PEPRouter);
-
-if (!(process.env.IDM_URL && process.env.IDM_IP_ADDRESS)) {
-    const IDMRouter = require('./routes/idm');
-    app.use('/', IDMRouter);
-}
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -1,0 +1,45 @@
+{
+	"info": {
+		"_postman_id": "a112b97b-b130-40cc-8b92-84daf8d446ba",
+		"name": "CSV-Excel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Upload CSV",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/csv",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"csv"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Excel",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/excel",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"excel"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

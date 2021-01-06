@@ -1,5 +1,11 @@
 const fs = require('fs');
 const csv = require('fast-csv');
+const JSONMeasure = require('../lib/measure');
+const config = require('../config');
+
+const headers = {}; // TO DO - add security headers.
+const Measure = new JSONMeasure(headers);
+const DEVICE_TRANSPORT = process.env.TRANSPORT || config.transport;
 
 const upload = (req, res) => {
     try {
@@ -9,7 +15,7 @@ const upload = (req, res) => {
 
         const records = [];
 
-        const path = __basedir + "/resources/static/assets/uploads/" + req.file.filename;
+        const path = __basedir + '/resources/static/assets/uploads/' + req.file.filename;
 
         fs.createReadStream(path)
             .pipe(csv.parse({ headers: true }))
@@ -20,10 +26,18 @@ const upload = (req, res) => {
                 records.push(row);
             })
             .on('end', () => {
-                console.error(records);
+                records.forEach((record) => {
+                    console.error(record);
+                    const deviceId = 1234;
+
+                    if (DEVICE_TRANSPORT === 'HTTP') {
+                        Measure.sendAsHTTP(deviceId, record);
+                    } else if (DEVICE_TRANSPORT === 'MQTT') {
+                        Measure.sendAsMQTT(deviceId, record);
+                    }
+                });
             });
         return res.status(204).send();
-
     } catch (error) {
         console.log(error);
         return res.status(500).send({

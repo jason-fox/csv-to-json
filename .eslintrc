@@ -8,6 +8,7 @@
     "no-shadow": 0
   },
   "globals": {
-    "__basedir": true
+    "__basedir": true,
+    "MQTT_CLIENT": true
   }
 }

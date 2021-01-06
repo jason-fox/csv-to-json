@@ -3,10 +3,13 @@ const JSONMeasure = require('../lib/measure');
 const config = require('../config');
 const debug = require('debug')('server:excel');
 const fs = require('fs');
+const _ = require('underscore')
 
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
 const DEVICE_TRANSPORT = process.env.TRANSPORT || config.transport;
+const replacements = Object.keys(config.replace);
+
 
 function removeXlsxFile(path){
     fs.unlink(path, (err) => {
@@ -18,17 +21,29 @@ function removeXlsxFile(path){
 
 function readXlsxRecords(rows) {
     const records = [];
+
+    const transpose  = _.zip.apply(_, rows);
+
+    const headerFields = _.map(transpose[0], (header) => {
+        const field = header.toLowerCase().replace(/ /g, '_');
+        return replacements.includes(field) ? config.replace[field] : field;
+    });
+
     // skip header
-    rows.shift();
-    rows.forEach((row) => {
-        const record = {
-            id: row[0],
-            title: row[1],
-            description: row[2],
-            published: row[3]
-        };
+    transpose.shift();
+    transpose.forEach((row) => {
+        let record = {};
+
+        headerFields.forEach((header, index) => {
+            const value = row[index];
+            if(!config.ignore.includes(value)) {
+                record[header] = value;
+            }
+        });
+        console.error(record);
         records.push(record);
     });
+
 
     return records;
 }
@@ -38,10 +53,11 @@ function createContextRequests(records){
     records.forEach((record) => {
         promises.push(
             new Promise((resolve, reject) => {
-                const deviceId = 1234;
-
-                console.error(record);
-
+                
+                const deviceId = record.id;
+                const timestamp = 
+                delete record.id;
+                
                 if (DEVICE_TRANSPORT === 'HTTP') {
                     Measure.sendAsHTTP(deviceId, record).then(
                         (values) => resolve(value),

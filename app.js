@@ -4,6 +4,8 @@ const Router = require('./routes/routes');
 const config = require('./config');
 const mqtt = require('mqtt');
 const app = express();
+const path = require('path');
+
 const DEVICE_TRANSPORT = process.env.TRANSPORT || config.transport;
 
 global.__basedir = __dirname;
@@ -11,6 +13,7 @@ global.__basedir = __dirname;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/', Router);
+app.use(express.static(path.join(__dirname, 'public')));
 
 if (DEVICE_TRANSPORT === 'MQTT') {
     const mqttBrokerUrl = process.env.MQTT_BROKER_URL || config.mqtt.url;

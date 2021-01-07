@@ -13,7 +13,9 @@ const config = {
         'position(km)': 'position',
         'sensor_timestep_(min)': 'sensor_timestep_min',
         'conductivity_range_(μs/cm)': 'conductivity_range',
-        'turbidity_range_(ntu)': 'turbidity_range'
+        'turbidity_range_(ntu)': 'turbidity_range',
+        'sensor_symbol': 'id',
+        'id': 'refDeviceModel'
     },
     ignore: ['NA', 'Not applicable']
 };

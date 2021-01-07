@@ -1,0 +1,29 @@
+{
+    "@context": {
+        "type": "@type",
+        "id": "@id",
+        "ngsi-ld": "https://uri.etsi.org/ngsi-ld/",
+        "fiware": "https://uri.fiware.org/ns/data-models#",
+        "schema": "https://schema.org/",
+        "fiware4water": "https://example.com/",
+        "Device": "fiware:Device",
+        "Water": "tutorial:Water",
+
+        "sensor_symbol": "fiware4water:sensor_symbol",
+        "code_station": "fiware4water:code_station",
+        "title": "http://purl.org/dc/terms/title",
+        "city": "schema:addressLocality",
+        "sensor_title": "fiware4water:sensor_title",
+        "installation_time": "fiware:dateInstalled",
+        "x": "fiware4water:x",
+        "y": "fiware4water:y",
+        "position": "fiware4water:position",
+        "refDeviceModel": "fiware:refDeviceModel",
+        "sensor_brand": "schema:brand",
+        "sensor_model": "schema:model",
+        "sensor_timestep_min": "fiware4water:sensor_timestep_min",
+        "code_unit": "fiware4water:code_unit",
+        "conductivity_range": "https://w3id.org/saref#conductivity",
+        "turbidity_range": "https://w3id.org/saref#turbidity"
+    }
+}

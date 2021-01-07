@@ -2,20 +2,29 @@ const fs = require('fs');
 const csv = require('fast-csv');
 const JSONMeasure = require('../lib/measure');
 const config = require('../config');
+const debug = require('debug')('server:csv');
 
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
 const DEVICE_TRANSPORT = process.env.TRANSPORT || config.transport;
 
-const upload = (req, res) => {
-    try {
-        if (req.file === undefined) {
-            return res.status(400).send('Please upload a CSV file!');
+/*
+ * Delete the temporary file
+ */
+function removeCsvFile(path) {
+    fs.unlink(path, (err) => {
+        if (err) {
+            throw err;
         }
+    });
+}
 
-        const records = [];
-
-        const path = __basedir + '/resources/static/assets/uploads/' + req.file.filename;
+/*
+ * Read the CSV data from the temporary file
+ */
+function readCsvFile(path) {
+    return new Promise((resolve, reject) => {
+        const rows = [];
 
         fs.createReadStream(path)
             .pipe(csv.parse({ headers: true }))
@@ -23,27 +32,78 @@ const upload = (req, res) => {
                 throw error.message;
             })
             .on('data', (row) => {
-                records.push(row);
+                rows.push(row);
             })
             .on('end', () => {
-                records.forEach((record) => {
-                    console.error(record);
-                    const deviceId = 1234;
-
-                    if (DEVICE_TRANSPORT === 'HTTP') {
-                        Measure.sendAsHTTP(deviceId, record);
-                    } else if (DEVICE_TRANSPORT === 'MQTT') {
-                        Measure.sendAsMQTT(deviceId, record);
-                    }
-                });
+                resolve(rows);
             });
-        return res.status(204).send();
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            message: 'Could not upload the file: ' + req.file.originalname
-        });
+    });
+}
+
+/*
+ * Manipulate the CSV data to create a series of measures
+ */
+function createMeasuresFromCsv(rows) {
+    return new Promise((resolve, reject) => {
+        const measures = rows;
+        resolve(measures);
+    });
+}
+
+/*
+ * Create an array of promises to send data to the context broker
+ */
+function createContextRequests(records) {
+    const promises = [];
+    records.forEach((record) => {
+        promises.push(
+            new Promise((resolve, reject) => {
+                const deviceId = record.id;
+                const timestamp = delete record.id;
+
+                if (DEVICE_TRANSPORT === 'HTTP') {
+                    Measure.sendAsHTTP(deviceId, record).then(
+                        (values) => resolve(value),
+                        (err) => {
+                            debug(err.message);
+                            reject(err.message);
+                        }
+                    );
+                } else if (DEVICE_TRANSPORT === 'MQTT') {
+                    resolve(Measure.sendAsMQTT(deviceId, record));
+                }
+            })
+        );
+    });
+    return promises;
+}
+
+const upload = (req, res) => {
+    if (req.file === undefined) {
+        return res.status(400).send('Please upload a CSV file!');
     }
+
+    const path = __basedir + '/resources/static/assets/uploads/' + req.file.filename;
+
+    readCsvFile(path)
+        .then((rows) => {
+            const measures = createMeasuresFromCsv(rows);
+            removeCsvFile(path);
+            return measures;
+        })
+        .then((measures) => {
+            return createContextRequests(measures);
+        })
+        .then((promises) => {
+            Promise.all(promises).then(
+                (val) => {
+                    return res.status(204).send();
+                },
+                (err) => {
+                    return res.status(500).send(err);
+                }
+            );
+        });
 };
 
 module.exports = {

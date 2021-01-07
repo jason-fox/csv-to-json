@@ -3,15 +3,17 @@ const JSONMeasure = require('../lib/measure');
 const config = require('../config');
 const debug = require('debug')('server:excel');
 const fs = require('fs');
-const _ = require('underscore')
+const _ = require('underscore');
 
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
 const DEVICE_TRANSPORT = process.env.TRANSPORT || config.transport;
 const replacements = Object.keys(config.replace);
 
-
-function removeXlsxFile(path){
+/*
+ * Delete the temporary file
+ */
+function removeXlsxFile(path) {
     fs.unlink(path, (err) => {
         if (err) {
             throw err;
@@ -19,10 +21,13 @@ function removeXlsxFile(path){
     });
 }
 
-function readXlsxRecords(rows) {
-    const records = [];
+/*
+ * Manipulate the CSV data to create a series of measures
+ */
+function createMeasuresFromXlsx(rows) {
+    const measures = [];
 
-    const transpose  = _.zip.apply(_, rows);
+    const transpose = _.zip.apply(_, rows);
 
     const headerFields = _.map(transpose[0], (header) => {
         const field = header.toLowerCase().replace(/ /g, '_');
@@ -32,32 +37,32 @@ function readXlsxRecords(rows) {
     // skip header
     transpose.shift();
     transpose.forEach((row) => {
-        let record = {};
+        let measure = {};
 
         headerFields.forEach((header, index) => {
             const value = row[index];
-            if(!config.ignore.includes(value)) {
-                record[header] = value;
+            if (!config.ignore.includes(value)) {
+                measure[header] = value;
             }
         });
-        console.error(record);
-        records.push(record);
+        console.error(measure);
+        measures.push(measure);
     });
 
-
-    return records;
+    return measures;
 }
 
-function createContextRequests(records){
+/*
+ * Create an array of promises to send data to the context broker
+ */
+function createContextRequests(records) {
     const promises = [];
     records.forEach((record) => {
         promises.push(
             new Promise((resolve, reject) => {
-                
                 const deviceId = record.id;
-                const timestamp = 
-                delete record.id;
-                
+                const timestamp = delete record.id;
+
                 if (DEVICE_TRANSPORT === 'HTTP') {
                     Measure.sendAsHTTP(deviceId, record).then(
                         (values) => resolve(value),
@@ -84,12 +89,12 @@ const upload = (req, res) => {
 
     readXlsxFile(path)
         .then((rows) => {
-            records = readXlsxRecords(rows);
+            const measures = createMeasuresFromXlsx(rows);
             removeXlsxFile(path);
-            return records;
+            return measures;
         })
-        .then((records) => {
-            return createContextRequests(records);
+        .then((measures) => {
+            return createContextRequests(measures);
         })
         .then((promises) => {
             Promise.all(promises).then(

@@ -100,7 +100,7 @@ const upload = async (req, res) => {
             return await Promise.allSettled(promises);
         })
         .then((results) => {
-            const errors = _.where(results, {status: "rejected"});
+            const errors = _.where(results, { status: 'rejected' });
             return errors.length ? res.status(500).json(errors) : res.status(204).send();
         })
         .catch((err) => {

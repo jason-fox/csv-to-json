@@ -3,6 +3,7 @@ const csv = require('fast-csv');
 const JSONMeasure = require('../lib/measure');
 const config = require('../config');
 const debug = require('debug')('server:csv');
+const _ = require('underscore');
 
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
@@ -98,7 +99,7 @@ const upload = (req, res) => {
             return await Promise.allSettled(promises);
         })
         .then((results) => {
-            const errors = _.where(results, {status: "rejected"});
+            const errors = _.where(results, { status: 'rejected' });
             return errors.length ? res.status(500).json(errors) : res.status(204).send();
         })
         .catch((err) => {

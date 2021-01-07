@@ -80,7 +80,7 @@ function createContextRequests(records) {
     return promises;
 }
 
-const upload = (req, res) => {
+const upload = async (req, res) => {
     if (req.file === undefined) {
         return res.status(400).send('Please upload an excel file!');
     }
@@ -96,15 +96,15 @@ const upload = (req, res) => {
         .then((measures) => {
             return createContextRequests(measures);
         })
-        .then((promises) => {
-            Promise.all(promises).then(
-                (val) => {
-                    return res.status(204).send();
-                },
-                (err) => {
-                    return res.status(500).send(err);
-                }
-            );
+        .then(async (promises) => {
+            return await Promise.allSettled(promises);
+        })
+        .then((results) => {
+            const errors = _.where(results, {status: "rejected"});
+            return errors.length ? res.status(500).json(errors) : res.status(204).send();
+        })
+        .catch((err) => {
+            return res.status(500).send(err);
         });
 };
 

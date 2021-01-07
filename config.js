@@ -1,13 +1,8 @@
 const config = {
-    apiKey: 1234,
-    transport: 'HTTP',
-    mqtt: {
-        url: 'mqtt://mosquitto'
-    },
-    http: {
-        host: 'localhost',
-        port: 7896,
-        resource: '/iot/json'
+    contextBroker: {
+        host: 'orion',
+        port: '1026',
+        jsonLdContext: 'http://csv-agent:3000/data-models/ngsi-context.jsonld' 
     },
     replace: {
         'position(km)': 'position',
@@ -17,7 +12,11 @@ const config = {
         'sensor_symbol': 'id',
         'id': 'refDeviceModel'
     },
-    ignore: ['NA', 'Not applicable']
+    ignore: ['NA', 'Not applicable'],
+    float: ['x', 'y'],
+    integer: ['position'],
+    datetime: ['installation_time'],
+    relationship: []
 };
 
 module.exports = config;

@@ -7,7 +7,6 @@ const _ = require('underscore');
 
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
-const DEVICE_TRANSPORT = process.env.TRANSPORT || config.transport;
 
 /*
  * Delete the temporary file
@@ -62,17 +61,13 @@ function createContextRequests(records) {
                 const deviceId = record.id;
                 const timestamp = delete record.id;
 
-                if (DEVICE_TRANSPORT === 'HTTP') {
-                    Measure.sendAsHTTP(deviceId, record).then(
+                Measure.sendAsHTTP(deviceId, record).then(
                         (values) => resolve(value),
                         (err) => {
                             debug(err.message);
                             reject(err.message);
                         }
                     );
-                } else if (DEVICE_TRANSPORT === 'MQTT') {
-                    resolve(Measure.sendAsMQTT(deviceId, record));
-                }
             })
         );
     });

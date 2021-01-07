@@ -4,10 +4,10 @@ const config = require('../config');
 const debug = require('debug')('server:excel');
 const fs = require('fs');
 const _ = require('underscore');
+const moment = require('moment-timezone');
 
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
-const DEVICE_TRANSPORT = process.env.TRANSPORT || config.transport;
 const replacements = Object.keys(config.replace);
 
 /*
@@ -42,43 +42,51 @@ function createMeasuresFromXlsx(rows) {
         headerFields.forEach((header, index) => {
             const value = row[index];
             if (!config.ignore.includes(value)) {
-                measure[header] = value;
+                measure[header] = {
+                    type:'Property',
+                    value
+                }
             }
         });
-        console.error(measure);
+
+        measure.type = 'Device';
+        measure.id = 'urn:ngsi-ld:Device:' + measure.id.value;
+
+        config.float.forEach((float) => {
+            if(measure[float]){
+                measure[float].value = Number.parseFloat(measure[float].value);
+            }
+        });
+        config.integer.forEach((integer) => {
+            if(measure[integer]){
+                 measure[integer].value = Number.parseFloat(measure[integer].value);
+            }
+        });
+       config.datetime.forEach((datetime) => {
+            if(measure[datetime]){
+                try {
+                    measure[datetime].value = {
+                    '@type': 'DateTime',
+                    '@value': moment.tz(measure[datetime].value, 'Etc/UTC').toISOString()
+                    };
+                } catch (e) {
+                    debug(e)
+                }
+            }
+        });
+        config.relationship.forEach((relationship) => {
+            if(measure[relationship]){
+                measure[relationship] = {
+                    type: 'Relationship',
+                    object: 'urn:ngsi-ld:DeviceModel:' + String(measure[relationship].value)
+                }
+            }
+        });
         measures.push(measure);
     });
-
     return measures;
 }
 
-/*
- * Create an array of promises to send data to the context broker
- */
-function createContextRequests(records) {
-    const promises = [];
-    records.forEach((record) => {
-        promises.push(
-            new Promise((resolve, reject) => {
-                const deviceId = record.id;
-                const timestamp = delete record.id;
-
-                if (DEVICE_TRANSPORT === 'HTTP') {
-                    Measure.sendAsHTTP(deviceId, record).then(
-                        (values) => resolve(value),
-                        (err) => {
-                            debug(err.message);
-                            reject(err.message);
-                        }
-                    );
-                } else if (DEVICE_TRANSPORT === 'MQTT') {
-                    resolve(Measure.sendAsMQTT(deviceId, record));
-                }
-            })
-        );
-    });
-    return promises;
-}
 
 const upload = async (req, res) => {
     if (req.file === undefined) {
@@ -93,15 +101,11 @@ const upload = async (req, res) => {
             removeXlsxFile(path);
             return measures;
         })
-        .then((measures) => {
-            return createContextRequests(measures);
+        .then(async (measures) => {
+            return await Measure.sendAsHTTP(measures)
         })
-        .then(async (promises) => {
-            return await Promise.allSettled(promises);
-        })
-        .then((results) => {
-            const errors = _.where(results, { status: 'rejected' });
-            return errors.length ? res.status(500).json(errors) : res.status(204).send();
+        .then((response) => {
+           return res.status(response.statusCode).json(response.body);
         })
         .catch((err) => {
             return res.status(500).send(err);

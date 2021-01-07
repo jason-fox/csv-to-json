@@ -16,10 +16,11 @@
     "got": "^11.8.1",
     "http-errors": "~1.6.3",
     "json2csv": "^5.0.3",
+    "moment": "~2.24.0",
+    "moment-timezone": "~0.5.25",
     "mqtt": "^4.1.0",
     "multer": "^1.4.2",
     "read-excel-file": "^4.0.6",
-    "request-promise": "^4.2.6",
     "underscore": "^1.12.0"
   },
   "devDependencies": {

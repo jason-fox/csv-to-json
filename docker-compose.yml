@@ -71,7 +71,7 @@ services:
       - "3000:3000" # localhost:3000
     environment:
       - "DEBUG=server:*"
-
+      - "MONGO_URL=mongodb://mongo-db:27017/iotagent-csv"
 
 networks:
   default:

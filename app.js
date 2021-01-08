@@ -1,24 +1,18 @@
 const createError = require('http-errors');
 const express = require('express');
 const Router = require('./routes/routes');
-const config = require('./config');
-const mqtt = require('mqtt');
+const db = require('./lib/dbConn');
 const app = express();
 const path = require('path');
 
-const DEVICE_TRANSPORT = process.env.TRANSPORT || config.transport;
-
 global.__basedir = __dirname;
+
+db.connect();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/', Router);
 app.use(express.static(path.join(__dirname, 'public')));
-
-if (DEVICE_TRANSPORT === 'MQTT') {
-    const mqttBrokerUrl = process.env.MQTT_BROKER_URL || config.mqtt.url;
-    global.MQTT_CLIENT = mqtt.connect(mqttBrokerUrl);
-}
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

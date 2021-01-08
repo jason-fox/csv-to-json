@@ -4,6 +4,7 @@ const JSONMeasure = require('../lib/measure');
 const config = require('../config');
 const debug = require('debug')('server:csv');
 const _ = require('underscore');
+const Device = require('../lib/Device');
 
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
@@ -62,12 +63,12 @@ function createContextRequests(records) {
                 const timestamp = delete record.id;
 
                 Measure.sendAsHTTP(deviceId, record).then(
-                        (values) => resolve(value),
-                        (err) => {
-                            debug(err.message);
-                            reject(err.message);
-                        }
-                    );
+                    (values) => resolve(value),
+                    (err) => {
+                        debug(err.message);
+                        reject(err.message);
+                    }
+                );
             })
         );
     });

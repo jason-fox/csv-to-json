@@ -5,10 +5,28 @@ const debug = require('debug')('server:excel');
 const fs = require('fs');
 const _ = require('underscore');
 const moment = require('moment-timezone');
+const Device = require('../lib/Device');
 
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
 const replacements = Object.keys(config.replace);
+
+function storeDeviceUnitCode(id, unitCode) {
+    const data = {unitCode};
+    debug(data);
+    try {
+        Device.model.findOneAndUpdate(
+            { id},
+            data,
+            { upsert: true },
+            function (err, doc) {
+                if (err){ debug(err.message);}
+            }
+        );
+    } catch (err){
+        debug(err.message);
+    }
+}
 
 /*
  * Delete the temporary file
@@ -22,10 +40,10 @@ function removeXlsxFile(path) {
 }
 
 /*
- * Manipulate the CSV data to create a series of measures
+ * Manipulate the Excel data to create a series of entities
  */
-function createMeasuresFromXlsx(rows) {
-    const measures = [];
+function createEntitiesFromXlsx(rows) {
+    const entities = [];
 
     const transpose = _.zip.apply(_, rows);
 
@@ -37,56 +55,63 @@ function createMeasuresFromXlsx(rows) {
     // skip header
     transpose.shift();
     transpose.forEach((row) => {
-        let measure = {};
+        const entity = {};
 
         headerFields.forEach((header, index) => {
             const value = row[index];
             if (!config.ignore.includes(value)) {
-                measure[header] = {
-                    type:'Property',
+                entity[header] = {
+                    type: 'Property',
                     value
-                }
+                };
             }
         });
 
-        measure.type = 'Device';
-        measure.id = 'urn:ngsi-ld:Device:' + measure.id.value;
+        entity.type = 'Device';
+        entity.id = 'urn:ngsi-ld:Device:' + entity.id.value;
 
         config.float.forEach((float) => {
-            if(measure[float]){
-                measure[float].value = Number.parseFloat(measure[float].value);
+            if (entity[float]) {
+                entity[float].value = Number.parseFloat(entity[float].value);
             }
         });
         config.integer.forEach((integer) => {
-            if(measure[integer]){
-                 measure[integer].value = Number.parseFloat(measure[integer].value);
+            if (entity[integer]) {
+                entity[integer].value = Number.parseFloat(entity[integer].value);
             }
         });
-       config.datetime.forEach((datetime) => {
-            if(measure[datetime]){
+        config.datetime.forEach((datetime) => {
+            if (entity[datetime]) {
                 try {
-                    measure[datetime].value = {
-                    '@type': 'DateTime',
-                    '@value': moment.tz(measure[datetime].value, 'Etc/UTC').toISOString()
+                    entity[datetime].value = {
+                        '@type': 'DateTime',
+                        '@value': moment.tz(entity[datetime].value, 'Etc/UTC').toISOString()
                     };
                 } catch (e) {
-                    debug(e)
+                    debug(e);
                 }
             }
         });
         config.relationship.forEach((relationship) => {
-            if(measure[relationship]){
-                measure[relationship] = {
+            if (entity[relationship]) {
+                entity[relationship] = {
                     type: 'Relationship',
-                    object: 'urn:ngsi-ld:DeviceModel:' + String(measure[relationship].value)
-                }
+                    object: 'urn:ngsi-ld:DeviceModel:' + String(entity[relationship].value)
+                };
             }
         });
-        measures.push(measure);
-    });
-    return measures;
-}
 
+        // Code unit is to be stored as metadata
+        if (entity.code_unit) {
+            storeDeviceUnitCode(entity.id, entity.code_unit.value, (err, doc) => {
+                debug('stored device', err);
+            });
+            delete entity.code_unit;
+        }
+        entities.push(entity);
+    });
+    return entities;
+}
 
 const upload = async (req, res) => {
     if (req.file === undefined) {
@@ -97,15 +122,15 @@ const upload = async (req, res) => {
 
     readXlsxFile(path)
         .then((rows) => {
-            const measures = createMeasuresFromXlsx(rows);
+            const entities = createEntitiesFromXlsx(rows);
             removeXlsxFile(path);
-            return measures;
+            return entities;
         })
-        .then(async (measures) => {
-            return await Measure.sendAsHTTP(measures)
+        .then(async (entities) => {
+            return await Measure.sendAsHTTP(entities);
         })
         .then((response) => {
-           return res.status(response.statusCode).json(response.body);
+            return res.status(response.statusCode).json(response.body);
         })
         .catch((err) => {
             return res.status(500).send(err);

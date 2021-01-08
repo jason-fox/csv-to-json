@@ -1,7 +1,6 @@
 const fs = require('fs');
 const csv = require('fast-csv');
 const JSONMeasure = require('../lib/measure');
-const config = require('../config');
 const debug = require('debug')('server:csv');
 const _ = require('underscore');
 const Device = require('../lib/Device');
@@ -41,14 +40,71 @@ function readCsvFile(path) {
     });
 }
 
+async function getDeviceUnitCode(id) {
+    let data;
+    const queryParams = {
+        id : 'urn:ngsi-ld:Device:' + id
+    };
+    const query = Device.model.findOne({});
+
+    try {
+        data = await query.lean().exec();
+    } catch (err) {
+        debug('error: ' + err);
+    }
+    return data ? data.unitCode : undefined;
+}
+
+function parseId(input) {
+    const regexId = /^[^\s]+/;
+    const regexKey = /[\w]+$/;
+    const id = regexId.exec(input)[0];
+    const key = regexKey.exec(input)[0];
+    const unitCode = getDeviceUnitCode(id);
+
+    return { id, key, unitCode };
+}
+
 /*
  * Manipulate the CSV data to create a series of measures
  */
 function createMeasuresFromCsv(rows) {
-    return new Promise((resolve, reject) => {
-        const measures = rows;
-        resolve(measures);
+    let timestampCol = 0;
+    const headerInfo = [];
+    const measures = [];
+    const headerRow = rows[0];
+    Object.keys(headerRow).forEach((header, index) => {
+        if (header === 'timestamp') {
+            timestampCol = index;
+            headerInfo.push(null);
+        } else {
+            const parsed = parseId(header);
+            if (parsed.id) {
+                headerInfo.push(parsed);
+            }
+        }
     });
+    rows.shift();
+
+    rows.forEach((row) => {
+        const values = _.values(row);
+        const measure = {};
+        values.forEach((value, index) => {
+            if (headerInfo[index] && value.trim() !== 'na') {
+                const id = headerInfo[index].id;
+                
+                const key = headerInfo[index].key.toLowerCase();
+
+                measure[id] = measure[id] || { id };
+                measure[id][key] = value;
+                measure[id].timestamp = values[timestampCol];
+            }
+        });
+        measures.push(_.values(measure));
+    });
+
+    console.error(measures)
+    return measures;
 }
 
 /*
@@ -59,11 +115,8 @@ function createContextRequests(records) {
     records.forEach((record) => {
         promises.push(
             new Promise((resolve, reject) => {
-                const deviceId = record.id;
-                const timestamp = delete record.id;
-
-                Measure.sendAsHTTP(deviceId, record).then(
-                    (values) => resolve(value),
+                Measure.sendAsHTTP(records).then(
+                    () => resolve(),
                     (err) => {
                         debug(err.message);
                         reject(err.message);

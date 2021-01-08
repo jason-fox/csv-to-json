@@ -12,18 +12,15 @@ const Measure = new JSONMeasure(headers);
 const replacements = Object.keys(config.replace);
 
 function storeDeviceUnitCode(id, unitCode) {
-    const data = {unitCode};
+    const data = { unitCode };
     debug(data);
     try {
-        Device.model.findOneAndUpdate(
-            { id},
-            data,
-            { upsert: true },
-            function (err, doc) {
-                if (err){ debug(err.message);}
+        Device.model.findOneAndUpdate({ id }, data, { upsert: true }, function (err) {
+            if (err) {
+                debug(err.message);
             }
-        );
-    } catch (err){
+        });
+    } catch (err) {
         debug(err.message);
     }
 }
@@ -103,7 +100,7 @@ function createEntitiesFromXlsx(rows) {
 
         // Code unit is to be stored as metadata
         if (entity.code_unit) {
-            storeDeviceUnitCode(entity.id, entity.code_unit.value, (err, doc) => {
+            storeDeviceUnitCode(entity.id, entity.code_unit.value, (err) => {
                 debug('stored device', err);
             });
             delete entity.code_unit;

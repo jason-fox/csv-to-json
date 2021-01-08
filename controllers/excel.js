@@ -11,6 +11,10 @@ const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
 const replacements = Object.keys(config.replace);
 
+/**
+ * The UnitCode is held in the static data, but need to be sent as
+ * meta data with each measurement.
+ */
 function storeDeviceUnitCode(id, unitCode) {
     const data = { unitCode };
     debug(data);

@@ -20,7 +20,8 @@ function removeCsvFile(path) {
 }
 
 /*
- * Read the CSV data from the temporary file
+ * Read the CSV data from the temporary file.
+ * This returns an in memory representation of the raw CSV file
  */
 function readCsvFile(path) {
     return new Promise((resolve, reject) => {
@@ -40,10 +41,13 @@ function readCsvFile(path) {
     });
 }
 
+/**
+ * Retieve the unitCode from the static data saved in a database.
+ */
 async function getDeviceUnitCode(id) {
     let data;
     const queryParams = {
-        id : 'urn:ngsi-ld:Device:' + id
+        id: 'urn:ngsi-ld:Device:' + id
     };
     const query = Device.model.findOne({});
 
@@ -55,20 +59,24 @@ async function getDeviceUnitCode(id) {
     return data ? data.unitCode : undefined;
 }
 
+/*
+ *  Strip the id and an key from the header row.
+ */
 function parseId(input) {
     const regexId = /^[^\s]+/;
     const regexKey = /[\w]+$/;
     const id = regexId.exec(input)[0];
     const key = regexKey.exec(input)[0];
-    const unitCode = getDeviceUnitCode(id);
 
-    return { id, key, unitCode };
+    return { id, key };
 }
 
 /*
  * Manipulate the CSV data to create a series of measures
+ * The data has been extracted based on the headers and other
+ * static data such as the unitCode.
  */
-function createMeasuresFromCsv(rows) {
+async function createMeasuresFromCsv(rows) {
     let timestampCol = 0;
     const headerInfo = [];
     const measures = [];
@@ -84,38 +92,86 @@ function createMeasuresFromCsv(rows) {
             }
         }
     });
-    rows.shift();
 
-    rows.forEach((row) => {
-        const values = _.values(row);
-        const measure = {};
-        values.forEach((value, index) => {
-            if (headerInfo[index] && value.trim() !== 'na') {
-                const id = headerInfo[index].id;
-                
-                const key = headerInfo[index].key.toLowerCase();
-
-                measure[id] = measure[id] || { id };
-                measure[id][key] = value;
-                measure[id].timestamp = values[timestampCol];
+    return await Promise.all(
+        headerInfo.map(async (headerInfo) => {
+            if (headerInfo) {
+                headerInfo.unitCode = await getDeviceUnitCode(headerInfo.id);
             }
-        });
-        measures.push(_.values(measure));
-    });
+            return headerInfo;
+        })
+    ).then((headerInfo) => {
+        rows.shift();
+        rows.forEach((row) => {
+            const values = _.values(row);
+            const measure = {};
+            values.forEach((value, index) => {
+                if (headerInfo[index] && value.trim() !== 'na') {
+                    const id = headerInfo[index].id;
+                    const unitCode = headerInfo[index].unitCode;
+                    const key = headerInfo[index].key.toLowerCase();
 
-    console.error(measures)
-    return measures;
+                    measure[id] = measure[id] || { id, unitCode };
+                    measure[id][key] = value;
+                    measure[id].timestamp = values[timestampCol];
+                }
+            });
+            measures.push(_.values(measure));
+        });
+        return measures;
+    });
 }
 
 /*
- * Create an array of promises to send data to the context broker
+ * Take the in memory data and format it as NSGI Entities
+ *
  */
-function createContextRequests(records) {
+function createEntitiesFromMeasures(measures) {
+    const allEntities = [];
+    measures.forEach((measure) => {
+        const entitiesAtTimeStamp = [];
+        const values = _.values(measure);
+        values.forEach((value, index) => {
+            const entity = {
+                id: 'urn:ngsi-ld:Device:' + value.id,
+                type: 'Device',
+                value: {
+                    property: 'Property',
+                    value: value.value
+                }
+            };
+
+            // Add metadata if present.
+            if (value.unitCode) {
+                entity.value.unitCode = value.unitCode;
+            }
+            if (value.timestamp) {
+                entity.value.observedAt = value.timestamp;
+            }
+            if (value.quality) {
+                entity.value.quality = {
+                    property: 'Property',
+                    value: value.quality
+                };
+            }
+
+            entitiesAtTimeStamp.push(entity);
+        });
+        allEntities.push(entitiesAtTimeStamp);
+    });
+    return allEntities;
+}
+
+/*
+ * Create an array of promises to send data to the context broker.
+ * Each insert represents a series of readings at a given timestamp
+ */
+function createContextRequests(entities) {
     const promises = [];
-    records.forEach((record) => {
+    entities.forEach((entitiesAtTimeStamp) => {
         promises.push(
             new Promise((resolve, reject) => {
-                Measure.sendAsHTTP(records).then(
+                Measure.sendAsHTTP(entitiesAtTimeStamp).then(
                     () => resolve(),
                     (err) => {
                         debug(err.message);
@@ -128,6 +184,10 @@ function createContextRequests(records) {
     return promises;
 }
 
+/**
+ * Actions when uploading a CSV file. The CSV file holds an array of
+ * measurements each at a given timestamp.
+ */
 const upload = (req, res) => {
     if (req.file === undefined) {
         return res.status(400).send('Please upload a CSV file!');
@@ -137,12 +197,17 @@ const upload = (req, res) => {
 
     readCsvFile(path)
         .then((rows) => {
-            const measures = createMeasuresFromCsv(rows);
+            return createMeasuresFromCsv(rows);
+        })
+        .then((measures) => {
             removeCsvFile(path);
             return measures;
         })
         .then((measures) => {
-            return createContextRequests(measures);
+            return createEntitiesFromMeasures(measures);
+        })
+        .then((entities) => {
+            return createContextRequests(entities);
         })
         .then(async (promises) => {
             return await Promise.allSettled(promises);

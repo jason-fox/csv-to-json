@@ -1,4 +1,9 @@
 
+```console
+./services start
+```
+
+
 Usage
 
 ```console
@@ -10,3 +15,5 @@ curl -L -X POST 'localhost:3000/csv' \
 curl -L -X POST 'localhost:3000/excel' \
 -F 'file=@"/path/to/excel-file.xlsx"'
 ```
+
+Or use the associated Postman file over the sample data.

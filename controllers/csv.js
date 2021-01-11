@@ -1,13 +1,11 @@
 const fs = require('fs');
 const csv = require('fast-csv');
-const JSONMeasure = require('../lib/measure');
+const Measure = require('../lib/measure');
 const debug = require('debug')('server:csv');
 const _ = require('underscore');
 const Device = require('../lib/Device');
 const Status = require('http-status-codes');
 const moment = require('moment-timezone');
-const headers = {}; // TO DO - add security headers.
-const Measure = new JSONMeasure(headers);
 
 /*
  * Delete the temporary file
@@ -113,7 +111,7 @@ async function createMeasuresFromCsv(rows) {
                     const key = headerInfo[index].key.toLowerCase();
 
                     measure[id] = measure[id] || { id, unitCode };
-                    measure[id][key] =Number.parseFloat(value);
+                    measure[id][key] = Number.parseFloat(value);
                     measure[id].timestamp = moment.tz(values[timestampCol], 'Etc/UTC').toISOString();
                 }
             });
@@ -170,19 +168,7 @@ function createEntitiesFromMeasures(measures) {
 function createContextRequests(entities) {
     const promises = [];
     entities.forEach((entitiesAtTimeStamp) => {
-        promises.push(
-            new Promise((resolve, reject) => {
-                Measure.sendAsHTTP(entitiesAtTimeStamp).then(
-                    (response) => {
-                        return resolve(response);
-                    },
-                    (err) => {
-                        debug(err.message);
-                        reject(err.message);
-                    }
-                );
-            })
-        );
+        promises.push(Measure.sendAsHTTP(entitiesAtTimeStamp));
     });
     return promises;
 }
@@ -213,7 +199,6 @@ const upload = (req, res) => {
             return await Promise.allSettled(promises);
         })
         .then((results) => {
-            console.error(results);
             const errors = _.where(results, { status: 'rejected' });
             return errors.length ? res.status(Status.BAD_REQUEST).json(errors) : res.status(Status.NO_CONTENT).send();
         })

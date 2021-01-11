@@ -1,14 +1,11 @@
 const readXlsxFile = require('read-excel-file/node');
-const JSONMeasure = require('../lib/measure');
+const Measure = require('../lib/measure');
 const config = require('../config');
 const debug = require('debug')('server:excel');
 const fs = require('fs');
 const _ = require('underscore');
 const moment = require('moment-timezone');
 const Device = require('../lib/Device');
-
-const headers = {}; // TO DO - add security headers.
-const Measure = new JSONMeasure(headers);
 const replacements = Object.keys(config.replace);
 const Status = require('http-status-codes');
 
@@ -128,10 +125,8 @@ const upload = (req, res) => {
             return entities;
         })
         .then(async (entities) => {
-            return await Measure.sendAsHTTP(entities);
-        })
-        .then((response) => {
-            return res.status(response.statusCode).json(response.body);
+            const cbResponse = await Measure.sendAsHTTP(entities);
+            return res.status(cbResponse ? cbResponse.statusCode : 204).send();
         })
         .catch((err) => {
             return res.status(Status.INTERNAL_SERVER_ERROR).send(err);

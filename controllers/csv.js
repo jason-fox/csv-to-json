@@ -4,7 +4,8 @@ const JSONMeasure = require('../lib/measure');
 const debug = require('debug')('server:csv');
 const _ = require('underscore');
 const Device = require('../lib/Device');
-
+const Status = require('http-status-codes');
+const moment = require('moment-timezone');
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
 
@@ -49,7 +50,7 @@ async function getDeviceUnitCode(id) {
     const queryParams = {
         id: 'urn:ngsi-ld:Device:' + id
     };
-    const query = Device.model.findOne({});
+    const query = Device.model.findOne(queryParams);
 
     try {
         data = await query.lean().exec();
@@ -112,8 +113,8 @@ async function createMeasuresFromCsv(rows) {
                     const key = headerInfo[index].key.toLowerCase();
 
                     measure[id] = measure[id] || { id, unitCode };
-                    measure[id][key] = value;
-                    measure[id].timestamp = values[timestampCol];
+                    measure[id][key] =Number.parseFloat(value);
+                    measure[id].timestamp = moment.tz(values[timestampCol], 'Etc/UTC').toISOString();
                 }
             });
             measures.push(_.values(measure));
@@ -131,12 +132,12 @@ function createEntitiesFromMeasures(measures) {
     measures.forEach((measure) => {
         const entitiesAtTimeStamp = [];
         const values = _.values(measure);
-        values.forEach((value, index) => {
+        values.forEach((value) => {
             const entity = {
                 id: 'urn:ngsi-ld:Device:' + value.id,
                 type: 'Device',
                 value: {
-                    property: 'Property',
+                    type: 'Property',
                     value: value.value
                 }
             };
@@ -150,7 +151,7 @@ function createEntitiesFromMeasures(measures) {
             }
             if (value.quality) {
                 entity.value.quality = {
-                    property: 'Property',
+                    type: 'Property',
                     value: value.quality
                 };
             }
@@ -172,7 +173,9 @@ function createContextRequests(entities) {
         promises.push(
             new Promise((resolve, reject) => {
                 Measure.sendAsHTTP(entitiesAtTimeStamp).then(
-                    () => resolve(),
+                    (response) => {
+                        return resolve(response);
+                    },
                     (err) => {
                         debug(err.message);
                         reject(err.message);
@@ -190,20 +193,17 @@ function createContextRequests(entities) {
  */
 const upload = (req, res) => {
     if (req.file === undefined) {
-        return res.status(400).send('Please upload a CSV file!');
+        return res.status(Status.UNSUPPORTED_MEDIA_TYPE).send('Please upload a CSV file!');
     }
 
     const path = __basedir + '/resources/static/assets/uploads/' + req.file.filename;
 
-    readCsvFile(path)
+    return readCsvFile(path)
         .then((rows) => {
             return createMeasuresFromCsv(rows);
         })
         .then((measures) => {
             removeCsvFile(path);
-            return measures;
-        })
-        .then((measures) => {
             return createEntitiesFromMeasures(measures);
         })
         .then((entities) => {
@@ -213,11 +213,13 @@ const upload = (req, res) => {
             return await Promise.allSettled(promises);
         })
         .then((results) => {
+            console.error(results);
             const errors = _.where(results, { status: 'rejected' });
-            return errors.length ? res.status(500).json(errors) : res.status(204).send();
+            return errors.length ? res.status(Status.BAD_REQUEST).json(errors) : res.status(Status.NO_CONTENT).send();
         })
         .catch((err) => {
-            return res.status(500).send(err);
+            debug(err.message);
+            return res.status(Status.INTERNAL_SERVER_ERROR).send(err.message);
         });
 };
 

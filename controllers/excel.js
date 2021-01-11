@@ -10,6 +10,7 @@ const Device = require('../lib/Device');
 const headers = {}; // TO DO - add security headers.
 const Measure = new JSONMeasure(headers);
 const replacements = Object.keys(config.replace);
+const Status = require('http-status-codes');
 
 /**
  * The UnitCode is held in the static data, but need to be sent as
@@ -45,8 +46,7 @@ function removeXlsxFile(path) {
  */
 function createEntitiesFromXlsx(rows) {
     const entities = [];
-
-    const transpose = _.zip.apply(_, rows);
+    const transpose = _.zip(...rows);
 
     const headerFields = _.map(transpose[0], (header) => {
         const field = header.toLowerCase().replace(/ /g, '_');
@@ -103,7 +103,7 @@ function createEntitiesFromXlsx(rows) {
         });
 
         // Code unit is to be stored as metadata
-        if (entity.code_unit) {
+        if (entity.code_unit && entity.code_unit.value !== '-') {
             storeDeviceUnitCode(entity.id, entity.code_unit.value, (err) => {
                 debug('stored device', err);
             });
@@ -114,14 +114,14 @@ function createEntitiesFromXlsx(rows) {
     return entities;
 }
 
-const upload = async (req, res) => {
+const upload = (req, res) => {
     if (req.file === undefined) {
-        return res.status(400).send('Please upload an excel file!');
+        return res.status(Status.UNSUPPORTED_MEDIA_TYPE).send('Please upload an excel file!');
     }
 
     const path = __basedir + '/resources/static/assets/uploads/' + req.file.filename;
 
-    readXlsxFile(path)
+    return readXlsxFile(path)
         .then((rows) => {
             const entities = createEntitiesFromXlsx(rows);
             removeXlsxFile(path);
@@ -134,7 +134,7 @@ const upload = async (req, res) => {
             return res.status(response.statusCode).json(response.body);
         })
         .catch((err) => {
-            return res.status(500).send(err);
+            return res.status(Status.INTERNAL_SERVER_ERROR).send(err);
         });
 };
 

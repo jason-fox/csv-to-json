@@ -4,8 +4,26 @@ const csvController = require('../controllers/csv');
 const excelController = require('../controllers/excel');
 const upload = require('../lib/upload');
 
-/* eslint-disable consistent-return */
-router.post('/csv', upload.single('file'), csvController.upload);
-router.post('/excel', upload.single('file'), excelController.upload);
+// Error Handling Helper Function
+function asyncHelper(fn) {
+    return function (req, res, next) {
+        fn(req, res, next).catch(next);
+    };
+}
+
+router.post(
+    '/csv',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await csvController.upload(req, res);
+    })
+);
+router.post(
+    '/excel',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await excelController.upload(req, res);
+    })
+);
 
 module.exports = router;

@@ -7,6 +7,22 @@ const Device = require('../lib/Device');
 const Status = require('http-status-codes');
 const moment = require('moment-timezone');
 
+const qualityCodes = {
+    1: 'ΟK',
+    2: 'Calculated value',
+    4: 'Local value',
+    8: 'Constant',
+    256: 'Not validated value',
+    512: 'Configuration fault',
+    1024: 'Out of range',
+    65536: 'Initial value',
+    131072: 'Device problem',
+    262144: 'Sensor problem',
+    524288: 'Connection problem',
+    1048576: 'Out of scan',
+    16711680: 'Other problem'
+};
+
 /*
  * Delete the temporary file
  */
@@ -150,7 +166,7 @@ function createEntitiesFromMeasures(measures) {
             if (value.quality) {
                 entity.value.quality = {
                     type: 'Property',
-                    value: value.quality
+                    value: qualityCodes[value.quality]
                 };
             }
 

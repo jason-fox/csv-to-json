@@ -10,6 +10,16 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/jasonfox/Workspace/junk/csv-to-json/sample-data/sensors.csv"
+						}
+					]
+				},
 				"url": {
 					"raw": "localhost:3000/csv",
 					"host": [
@@ -28,6 +38,16 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/jasonfox/Workspace/junk/csv-to-json/sample-data/sensors.xlsx"
+						}
+					]
+				},
 				"url": {
 					"raw": "localhost:3000/excel",
 					"host": [
@@ -79,7 +99,7 @@
 			"response": []
 		},
 		{
-			"name": "Read from Orion Direct",
+			"name": "Read from Orion - multiple Devices",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -102,7 +122,7 @@
 					"raw": "[{\n    \"id\": \"urn:ngsi-ld:Device:00004084540003\",\n    \"code_station\": {\n        \"type\": \"Property\",\n        \"value\": 408454\n    },\n    \"refDeviceModel\": {\n        \"type\": \"Property\",\n        \"value\": 17730151\n    },\n    \"title\": {\n        \"type\": \"Property\",\n        \"value\": \"Saranti (breaking point)\"\n    },\n    \"city\": {\n        \"type\": \"Property\",\n        \"value\": \"Saranti\"\n    },\n    \"sensor_title\": {\n        \"type\": \"Property\",\n        \"value\": \"Turbidity\"\n    },\n    \"installation_time\": {\n        \"type\": \"Property\",\n        \"value\": \"2016-10-21T12: 00: 00.000Z\"\n    },\n    \"x\": {\n        \"type\": \"Property\",\n        \"value\": 401335.27\n    },\n    \"y\": {\n        \"type\": \"Property\",\n        \"value\": 4235218.46\n    },\n    \"position\": {\n        \"type\": \"Property\",\n        \"value\": 76853\n    },\n    \"sensor_brand\": {\n        \"type\": \"Property\",\n        \"value\": \"Metrica\"\n    },\n    \"sensor_model\": {\n        \"type\": \"Property\",\n        \"value\": \"Metrica\"\n    },\n    \"sensor_timestep_min\": {\n        \"type\": \"Property\",\n        \"value\": 5\n    },\n    \"code_unit\": {\n        \"type\": \"Property\",\n        \"value\": \"NTU\"\n    },\n    \"scada_connection\": {\n        \"type\": \"Property\",\n        \"value\": \"NO\"\n    },\n    \"turbidity_range\": {\n        \"type\": \"Property\",\n        \"value\": \"0-3000\"\n    },\n    \"type\": \"Device\"\n}]\n"
 				},
 				"url": {
-					"raw": "http://localhost:1026/ngsi-ld/v1/entities?type=Device",
+					"raw": "http://localhost:1026/ngsi-ld/v1/entities?type=Device&options=keyValues",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -117,7 +137,122 @@
 						{
 							"key": "type",
 							"value": "Device"
+						},
+						{
+							"key": "options",
+							"value": "keyValues"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read from Orion - Device",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Link",
+						"value": "<http://csv-agent:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[{\n    \"id\": \"urn:ngsi-ld:Device:00004084540003\",\n    \"code_station\": {\n        \"type\": \"Property\",\n        \"value\": 408454\n    },\n    \"refDeviceModel\": {\n        \"type\": \"Property\",\n        \"value\": 17730151\n    },\n    \"title\": {\n        \"type\": \"Property\",\n        \"value\": \"Saranti (breaking point)\"\n    },\n    \"city\": {\n        \"type\": \"Property\",\n        \"value\": \"Saranti\"\n    },\n    \"sensor_title\": {\n        \"type\": \"Property\",\n        \"value\": \"Turbidity\"\n    },\n    \"installation_time\": {\n        \"type\": \"Property\",\n        \"value\": \"2016-10-21T12: 00: 00.000Z\"\n    },\n    \"x\": {\n        \"type\": \"Property\",\n        \"value\": 401335.27\n    },\n    \"y\": {\n        \"type\": \"Property\",\n        \"value\": 4235218.46\n    },\n    \"position\": {\n        \"type\": \"Property\",\n        \"value\": 76853\n    },\n    \"sensor_brand\": {\n        \"type\": \"Property\",\n        \"value\": \"Metrica\"\n    },\n    \"sensor_model\": {\n        \"type\": \"Property\",\n        \"value\": \"Metrica\"\n    },\n    \"sensor_timestep_min\": {\n        \"type\": \"Property\",\n        \"value\": 5\n    },\n    \"code_unit\": {\n        \"type\": \"Property\",\n        \"value\": \"NTU\"\n    },\n    \"scada_connection\": {\n        \"type\": \"Property\",\n        \"value\": \"NO\"\n    },\n    \"turbidity_range\": {\n        \"type\": \"Property\",\n        \"value\": \"0-3000\"\n    },\n    \"type\": \"Device\"\n}]\n"
+				},
+				"url": {
+					"raw": "http://localhost:1026/ngsi-ld/v1/entities/urn:ngsi-ld:Device:0FPVRD",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1026",
+					"path": [
+						"ngsi-ld",
+						"v1",
+						"entities",
+						"urn:ngsi-ld:Device:0FPVRD"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read from Orion - Device No Context",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Link",
+						"value": "<http://csv-agent:3000/data-models/ngsi-context.jsonld>; rel=\"http://www.w3.org/ns/json-ld#context\"; type=\"application/ld+json\"",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[{\n    \"id\": \"urn:ngsi-ld:Device:00004084540003\",\n    \"code_station\": {\n        \"type\": \"Property\",\n        \"value\": 408454\n    },\n    \"refDeviceModel\": {\n        \"type\": \"Property\",\n        \"value\": 17730151\n    },\n    \"title\": {\n        \"type\": \"Property\",\n        \"value\": \"Saranti (breaking point)\"\n    },\n    \"city\": {\n        \"type\": \"Property\",\n        \"value\": \"Saranti\"\n    },\n    \"sensor_title\": {\n        \"type\": \"Property\",\n        \"value\": \"Turbidity\"\n    },\n    \"installation_time\": {\n        \"type\": \"Property\",\n        \"value\": \"2016-10-21T12: 00: 00.000Z\"\n    },\n    \"x\": {\n        \"type\": \"Property\",\n        \"value\": 401335.27\n    },\n    \"y\": {\n        \"type\": \"Property\",\n        \"value\": 4235218.46\n    },\n    \"position\": {\n        \"type\": \"Property\",\n        \"value\": 76853\n    },\n    \"sensor_brand\": {\n        \"type\": \"Property\",\n        \"value\": \"Metrica\"\n    },\n    \"sensor_model\": {\n        \"type\": \"Property\",\n        \"value\": \"Metrica\"\n    },\n    \"sensor_timestep_min\": {\n        \"type\": \"Property\",\n        \"value\": 5\n    },\n    \"code_unit\": {\n        \"type\": \"Property\",\n        \"value\": \"NTU\"\n    },\n    \"scada_connection\": {\n        \"type\": \"Property\",\n        \"value\": \"NO\"\n    },\n    \"turbidity_range\": {\n        \"type\": \"Property\",\n        \"value\": \"0-3000\"\n    },\n    \"type\": \"Device\"\n}]\n"
+				},
+				"url": {
+					"raw": "http://localhost:1026/ngsi-ld/v1/entities?type=https://uri.fiware.org/ns/data-models%23Device",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1026",
+					"path": [
+						"ngsi-ld",
+						"v1",
+						"entities"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "https://uri.fiware.org/ns/data-models%23Device"
+						},
+						{
+							"key": "options",
+							"value": "keyValues",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Context",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/data-models/ngsi-context.jsonld",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"data-models",
+						"ngsi-context.jsonld"
 					]
 				}
 			},

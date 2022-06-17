@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const csvController = require('../controllers/csv');
 const excelController = require('../controllers/excel');
+const jsonController = require('../controllers/json');
 const upload = require('../lib/upload');
 
 // Error Handling Helper Function
@@ -23,6 +24,13 @@ router.post(
     upload.single('file'),
     asyncHelper(async (req, res) => {
         await excelController.upload(req, res);
+    })
+);
+
+router.post(
+    '/json',
+    asyncHelper(async (req, res) => {
+        await jsonController.upload(req, res);
     })
 );
 

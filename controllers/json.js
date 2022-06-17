@@ -63,7 +63,7 @@ const upload = (req, res) => {
   "sexe": "2",
   "chainePere": "سامي أمري",
   "chaineMere": "حسنى بني",
-  "dateNaiss": "12/03/1983"
+  "dateNaiss": "02/03/1992"
 }
 
 

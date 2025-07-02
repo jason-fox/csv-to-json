@@ -75,17 +75,17 @@ function createEntitiesFromRows(rows) {
             slope:  {
                 type: 'Property',
                 value: Number.parseFloat(row.pente),
-                unitCode: 'DEG'
+                unitCode: 'DD'
             },
-            soil_aciditty:  {
+            soil_acidity:  {
                 type: 'Property',
                 value: Number.parseFloat(row.ph_sol),
-                unitCode: 'PH'
+                unitCode: 'Q30'
             },
             rainfall:  {
                 type: 'Property',
                 value: Number.parseFloat(row.pluie),
-                unitCode: 'MM'
+                unitCode: 'MMT'
             },
             temperature:  {
                 type: 'Property',
@@ -95,17 +95,17 @@ function createEntitiesFromRows(rows) {
             age:  {
                 type: 'Property',
                 value: Number.parseFloat(row.age_arbre),
-                unitCode: 'YRS'
+                unitCode: 'ANN'
             },
              fertilisation:  {
                 type: 'Property',
-                value: Number.parseFloat(row.fertilisation),
-                unitCode: 'KG/HA'
+                value: 0.1 * Number.parseFloat(row.fertilisation),
+                unitCode: 'GM'
             },
             treatments:  {
                 type: 'Property',
                 value: Number.parseFloat(row.traitement_pesticide),
-                unitCode: '/YR'
+                unitCode: 'H09'
             },
 
             pest_presence:  {
@@ -126,18 +126,18 @@ function createEntitiesFromRows(rows) {
             },
               yield:  {
                 type: 'Property',
-                value: Number.parseInt(row.rendement_kg_ha),
-                unitCode: 'KG/HA'
+                value: 0.1 * Number.parseInt(row.rendement_kg_ha),
+                unitCode: 'GM'
             },
               age_of_farmer:  {
                 type: 'Property',
                 value: Number.parseInt(row.age_producteur),
-                unitCode: 'KG/HA'
+                unitCode: 'ANN'
             },
             experience_of_farmer:  {
                 type: 'Property',
                 value: Number.parseInt(row.experience_producteur),
-                unitCode: 'KG/HA'
+                unitCode: 'ANN'
             },
             handlingCount:  {
                 type: 'Property',
@@ -146,8 +146,6 @@ function createEntitiesFromRows(rows) {
             childrenCount: {
               type: 'Property',
                 value: Number.parseInt(row.nb_enfants_plus_12)
-                ,
-                unitCode: '/YR'
             },
             levelOfEducation: {
                 type: 'VocabProperty',

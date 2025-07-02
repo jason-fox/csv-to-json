@@ -1,9 +1,9 @@
 const config = {
     mongodb: 'mongodb://localhost:27017/iotagent-csv',
     contextBroker: {
-        host: 'orion',
+        host: 'localhost',
         port: '1026',
-        jsonLdContext: 'http://csv-agent:3000/data-models/ngsi-context.jsonld'
+        jsonLdContext: 'https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.8.jsonld'
     },
     replace: {
         'position(km)': 'position',

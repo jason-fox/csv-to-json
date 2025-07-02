@@ -3,25 +3,9 @@ const csv = require('fast-csv');
 const Measure = require('../lib/measure');
 const debug = require('debug')('server:csv');
 const _ = require('underscore');
-const Device = require('../lib/Device');
 const Status = require('http-status-codes');
 const moment = require('moment-timezone');
 
-const qualityCodes = {
-    1: 'ΟK',
-    2: 'Calculated value',
-    4: 'Local value',
-    8: 'Constant',
-    256: 'Not validated value',
-    512: 'Configuration fault',
-    1024: 'Out of range',
-    65536: 'Initial value',
-    131072: 'Device problem',
-    262144: 'Sensor problem',
-    524288: 'Connection problem',
-    1048576: 'Out of scan',
-    16711680: 'Other problem'
-};
 
 /*
  * Delete the temporary file
@@ -56,23 +40,7 @@ function readCsvFile(path) {
     });
 }
 
-/**
- * Retieve the unitCode from the static data saved in a database.
- */
-async function getDeviceUnitCode(id) {
-    let data;
-    const queryParams = {
-        id: 'urn:ngsi-ld:Device:' + id
-    };
-    const query = Device.model.findOne(queryParams);
 
-    try {
-        data = await query.lean().exec();
-    } catch (err) {
-        debug('error: ' + err);
-    }
-    return data ? data.unitCode : undefined;
-}
 
 /*
  *  Strip the id and an key from the header row.
@@ -86,93 +54,128 @@ function parseId(input) {
     return { id, key };
 }
 
-/*
- * Manipulate the CSV data to create a series of measures
- * The data has been extracted based on the headers and other
- * static data such as the unitCode.
- */
-async function createMeasuresFromCsv(rows) {
-    let timestampCol = 0;
-    const headerInfo = [];
-    const measures = [];
-    const headerRow = rows[0];
-    Object.keys(headerRow).forEach((header, index) => {
-        if (header === 'timestamp') {
-            timestampCol = index;
-            headerInfo.push(null);
+function createEntitiesFromRows(rows) {
+    const allEntities = [];
+
+    rows.forEach((row) => {
+        const timestamp = moment.tz(row.annee, 'Etc/UTC').toISOString() 
+        const entity = {
+
+             id: 'urn:ngsi-ld:AgriParcel:' +row.parcelle_id.toLowerCase(),
+             type: 'AgriParcel',
+            variety: {
+                type: 'VocabProperty',
+                vocab: row.variete
+            },
+            altitude:  {
+                type: 'Property',
+                value: Number.parseFloat(row.altitude),
+                unitCode: 'MTR'
+            },
+            slope:  {
+                type: 'Property',
+                value: Number.parseFloat(row.pente),
+                unitCode: 'DEG'
+            },
+            soil_aciditty:  {
+                type: 'Property',
+                value: Number.parseFloat(row.ph_sol),
+                unitCode: 'PH'
+            },
+            rainfall:  {
+                type: 'Property',
+                value: Number.parseFloat(row.pluie),
+                unitCode: 'MM'
+            },
+            temperature:  {
+                type: 'Property',
+                value: Number.parseFloat(row.temperature),
+                unitCode: 'CEL'
+            },
+            age:  {
+                type: 'Property',
+                value: Number.parseFloat(row.age_arbre),
+                unitCode: 'YRS'
+            },
+             fertilisation:  {
+                type: 'Property',
+                value: Number.parseFloat(row.fertilisation),
+                unitCode: 'KG/HA'
+            },
+            treatments:  {
+                type: 'Property',
+                value: Number.parseFloat(row.traitement_pesticide),
+                unitCode: '/YR'
+            },
+
+            pest_presence:  {
+                type: 'Property',
+                value: (Number.parseInt(row.presence_ravageur) === 1)
+            },
+            access_to_training:  {
+                type: 'Property',
+                value: (Number.parseInt(row.acces_formation) === 1)
+            },
+             size:  {
+                type: 'Property',
+                value: Number.parseInt(row.taille) 
+            },
+             handWorked:  {
+                type: 'Property',
+                value: (Number.parseInt(row.main_oeuvre) === 1)
+            },
+              yield:  {
+                type: 'Property',
+                value: Number.parseInt(row.rendement_kg_ha),
+                unitCode: 'KG/HA'
+            },
+              age_of_farmer:  {
+                type: 'Property',
+                value: Number.parseInt(row.age_producteur),
+                unitCode: 'KG/HA'
+            },
+            experience_of_farmer:  {
+                type: 'Property',
+                value: Number.parseInt(row.experience_producteur),
+                unitCode: 'KG/HA'
+            },
+            handlingCount:  {
+                type: 'Property',
+                value: Number.parseInt(row.taille_menage)
+            },
+            childrenCount: {
+              type: 'Property',
+                value: Number.parseInt(row.nb_enfants_plus_12)
+                ,
+                unitCode: '/YR'
+            },
+            levelOfEducation: {
+                type: 'VocabProperty',
+                vocab: row.niveau_education
+            },
+            sex: {
+                type: 'VocabProperty',
+                vocab: row.sexe
+            },
+
+
+
+
+
+
+
+        };
+
+        Object.keys(entity).forEach((key, index) => {
+        if (key === 'id') {
+        } else if (key === 'type') {
         } else {
-            const parsed = parseId(header);
-            if (parsed.id) {
-                headerInfo.push(parsed);
-            }
+            entity[key].observedAt = timestamp;
         }
     });
 
-    return await Promise.all(
-        headerInfo.map(async (headerInfo) => {
-            if (headerInfo) {
-                headerInfo.unitCode = await getDeviceUnitCode(headerInfo.id);
-            }
-            return headerInfo;
-        })
-    ).then((headerInfo) => {
-        rows.shift();
-        rows.forEach((row) => {
-            const values = _.values(row);
-            const measure = {};
-            values.forEach((value, index) => {
-                if (headerInfo[index] && value.trim() !== 'na') {
-                    const id = headerInfo[index].id;
-                    const unitCode = headerInfo[index].unitCode;
-                    const key = headerInfo[index].key.toLowerCase();
 
-                    measure[id] = measure[id] || { id, unitCode };
-                    measure[id][key] = Number.parseFloat(value);
-                    measure[id].timestamp = moment.tz(values[timestampCol], 'Etc/UTC').toISOString();
-                }
-            });
-            measures.push(_.values(measure));
-        });
-        return measures;
-    });
-}
-
-/*
- * Take the in memory data and format it as NSGI Entities
- *
- */
-function createEntitiesFromMeasures(measures) {
-    const allEntities = [];
-    measures.forEach((measure) => {
-        const entitiesAtTimeStamp = [];
-        const values = _.values(measure);
-        values.forEach((value) => {
-            const entity = {
-                id: 'urn:ngsi-ld:Device:' + value.id,
-                type: 'Device',
-                value: {
-                    type: 'Property',
-                    value: value.value
-                }
-            };
-
-            // Add metadata if present.
-            if (value.unitCode) {
-                entity.value.unitCode = value.unitCode;
-            }
-            if (value.timestamp) {
-                entity.value.observedAt = value.timestamp;
-            }
-            if (value.quality) {
-                entity.value.quality = {
-                    type: 'Property',
-                    value: qualityCodes[value.quality]
-                };
-            }
-
-            entitiesAtTimeStamp.push(entity);
-        });
-        allEntities.push(entitiesAtTimeStamp);
+        allEntities.push(entity);
     });
     return allEntities;
 }
@@ -202,14 +205,21 @@ const upload = (req, res) => {
 
     return readCsvFile(path)
         .then((rows) => {
-            return createMeasuresFromCsv(rows);
-        })
-        .then((measures) => {
             removeCsvFile(path);
-            return createEntitiesFromMeasures(measures);
+            //console.log(rows[0])
+            return createEntitiesFromRows(rows);
         })
         .then((entities) => {
-            return createContextRequests(entities);
+            console.log(JSON.stringify(entities[0], null, 2))
+
+            batchEntities = []
+            const chunkSize = 50;
+            for (let i = 0; i < entities.length; i += chunkSize) {
+                const chunk = entities.slice(i, i + chunkSize);
+                batchEntities.push(chunk)
+            }
+
+            return createContextRequests(batchEntities);
         })
         .then(async (promises) => {
             return await Promise.allSettled(promises);

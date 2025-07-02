@@ -1,13 +1,13 @@
 const express = require('express');
 const Router = require('./routes/routes');
-const db = require('./lib/dbConn');
+//const db = require('./lib/dbConn');
 const app = express();
 const path = require('path');
 const Status = require('http-status-codes');
 
 global.__basedir = __dirname;
 
-db.connect();
+//db.connect();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

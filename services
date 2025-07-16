@@ -44,7 +44,7 @@ getHeartbeat(){
 waitForOrion () {
 	echo -e "\n⏳ Waiting for \033[1;34mOrion-LD\033[0m to be available\n"
 	
-	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-orion` == "healthy" ]
+	while ! [ `docker inspect --format='{{.State.Health.Status}}' fiware-orion-ld` == "healthy" ]
 	do
 		echo -e "\nContext Broker HTTP state: ${response} (waiting for 200)"
 		pause 6

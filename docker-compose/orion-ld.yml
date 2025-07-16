@@ -43,9 +43,9 @@ services:
     hostname: mongo-db
     container_name: db-mongo
     expose:
-      - "${MONGO_DB_PORT}"
+      - ${MONGO_DB_PORT}
     ports:
-      - "${MONGO_DB_PORT}:${MONGO_DB_PORT}" # localhost:27017
+      - ${MONGO_DB_PORT}:${MONGO_DB_PORT}
     networks:
       - default
     volumes:

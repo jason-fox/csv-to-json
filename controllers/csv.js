@@ -129,7 +129,7 @@ function createEntitiesFromRows(rows) {
                 value: 0.1 * Number.parseInt(row.rendement_kg_ha),
                 unitCode: 'GM'
             },
-              age_of_farmer:  {
+            age_of_farmer:  {
                 type: 'Property',
                 value: Number.parseInt(row.age_producteur),
                 unitCode: 'ANN'

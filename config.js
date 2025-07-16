@@ -3,7 +3,7 @@ const config = {
     contextBroker: {
         host: 'localhost',
         port: '1026',
-        jsonLdContext: 'https://uri.etsi.org/ngsi-ld/v1/ngsi-ld-core-context-v1.8.jsonld'
+        jsonLdContext: 'http://context/user-context.jsonld'
     },
     replace: {
         'position(km)': 'position',

@@ -35,9 +35,10 @@ services:
   postgres:
     labels:
       org.fiware: 'tutorial'
-    image: postgis/postgis
+    image: postgis/postgis:${POSTGIS_VERSION}
     hostname: postgres
     container_name: db-postgres
+    platform: linux/amd64
     networks:
       - default
     ports:

@@ -26,6 +26,8 @@ services:
     container_name: fiware-scorpio
     networks:
       - default
+    expose:
+      - ${EXPOSED_PORT}
     ports:
       - "${EXPOSED_PORT}:${SCORPIO_PORT}"
     depends_on:

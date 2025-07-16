@@ -28,6 +28,8 @@ services:
       - mongo-db
     networks:
       - default
+    expose:
+      - ${EXPOSED_PORT}
     ports:
       - ${EXPOSED_PORT:-1026}:${ORION_LD_PORT:-1026}
     command: -dbhost mongo-db -logLevel INFO -forwarding -mongocOnly -wip entityMaps

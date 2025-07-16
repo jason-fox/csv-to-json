@@ -220,7 +220,12 @@ const upload = (req, res) => {
             return createContextRequests(batchEntities);
         })
         .then(async (promises) => {
-            return await Promise.allSettled(promises);
+            const results =[];
+            for (const promise of promises) {
+              const result = await promise;
+              results.push(result)
+            }
+            return results;
         })
         .then((results) => {
             const errors = _.where(results, { status: 'rejected' });

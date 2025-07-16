@@ -16,7 +16,7 @@
 # 
 # see: https://smartsdk.github.io/smartsdk-recipes/
 #
-version: "3.5"
+
 services:
   # @context file is served from here
   ld-context:

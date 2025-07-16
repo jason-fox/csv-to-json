@@ -55,6 +55,6 @@ services:
       test: ["CMD","mongosh", "localhost:27017/test", "--quiet"]
 
 
-  volumes:
-    mongo-db: ~
-    mongo-config: ~
+volumes:
+  mongo-db: ~
+  mongo-config: ~

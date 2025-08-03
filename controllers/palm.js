@@ -76,7 +76,13 @@ function createEntitiesFromRows(rows) {
                 type: 'Property',
                 value: row.LOCALISATION
             },
-        
+            location: {
+                type: 'GeoProperty',
+                value: {
+                     type: 'Point',
+                     coordinates: [13.3505, 52.5144]
+                }
+            },
 
 
             // slope:  {

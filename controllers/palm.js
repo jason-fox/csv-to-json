@@ -57,104 +57,111 @@ function parseId(input) {
 function createEntitiesFromRows(rows) {
     const allEntities = [];
 
-    rows.forEach((row) => {
+    rows.forEach((row, index) => {
         const timestamp = moment.tz(row.annee, 'Etc/UTC').toISOString() 
         const entity = {
 
-             id: 'urn:ngsi-ld:AgriParcel:' +row.parcelle_id.toLowerCase(),
+             id: 'urn:ngsi-ld:AgriParcel:' + row.ID.toLowerCase(),
              type: 'AgriParcel',
-            variety: {
-                type: 'VocabProperty',
-                vocab: row.variete
-            },
-            altitude:  {
-                type: 'Property',
-                value: Number.parseFloat(row.altitude),
-                unitCode: 'MTR'
-            },
-            slope:  {
-                type: 'Property',
-                value: Number.parseFloat(row.pente),
-                unitCode: 'DD'
-            },
-            soil_acidity:  {
-                type: 'Property',
-                value: Number.parseFloat(row.ph_sol),
-                unitCode: 'Q30'
-            },
-            rainfall:  {
-                type: 'Property',
-                value: Number.parseFloat(row.pluie),
-                unitCode: 'MMT'
-            },
-            temperature:  {
-                type: 'Property',
-                value: Number.parseFloat(row.temperature),
-                unitCode: 'CEL'
-            },
-            age:  {
-                type: 'Property',
-                value: Number.parseFloat(row.age_arbre),
-                unitCode: 'ANN'
-            },
-             fertilisation:  {
-                type: 'Property',
-                value: 0.1 * Number.parseFloat(row.fertilisation),
-                unitCode: 'GM'
-            },
-            treatments:  {
-                type: 'Property',
-                value: Number.parseFloat(row.traitement_pesticide),
-                unitCode: 'H09'
-            },
 
-            pest_presence:  {
+            region:  {
                 type: 'Property',
-                value: (Number.parseInt(row.presence_ravageur) === 1)
+                value: row.REGION
             },
-            access_to_training:  {
-                type: 'Property',
-                value: (Number.parseInt(row.acces_formation) === 1)
-            },
-             size:  {
-                type: 'Property',
-                value: Number.parseInt(row.taille) 
-            },
-             handWorked:  {
-                type: 'Property',
-                value: (Number.parseInt(row.main_oeuvre) === 1)
-            },
-              yield:  {
-                type: 'Property',
-                value: 0.1 * Number.parseInt(row.rendement_kg_ha),
-                unitCode: 'GM'
-            },
-            age_of_farmer:  {
-                type: 'Property',
-                value: Number.parseInt(row.age_producteur),
-                unitCode: 'ANN'
-            },
-            experience_of_farmer:  {
-                type: 'Property',
-                value: Number.parseInt(row.experience_producteur),
-                unitCode: 'ANN'
-            },
-            handlingCount:  {
-                type: 'Property',
-                value: Number.parseInt(row.taille_menage)
-            },
-            childrenCount: {
-              type: 'Property',
-                value: Number.parseInt(row.nb_enfants_plus_12)
-            },
-            levelOfEducation: {
+            area_code: {
                 type: 'VocabProperty',
-                vocab: row.niveau_education
+                vocab: row.CODIFICATION
             },
-            sex: {
-                type: 'VocabProperty',
-                vocab: row.sexe
+            position: {
+                type: 'Property',
+                value: row.LOCALISATION
             },
+        
+
+
+            // slope:  {
+            //     type: 'Property',
+            //     value: Number.parseFloat(row.pente),
+            //     unitCode: 'DD'
+            // },
+            // soil_acidity:  {
+            //     type: 'Property',
+            //     value: Number.parseFloat(row.ph_sol),
+            //     unitCode: 'Q30'
+            // },
+            // rainfall:  {
+            //     type: 'Property',
+            //     value: Number.parseFloat(row.pluie),
+            //     unitCode: 'MMT'
+            // },
+            // temperature:  {
+            //     type: 'Property',
+            //     value: Number.parseFloat(row.temperature),
+            //     unitCode: 'CEL'
+            // },
+            // age:  {
+            //     type: 'Property',
+            //     value: Number.parseFloat(row.age_arbre),
+            //     unitCode: 'ANN'
+            // },
+            //  fertilisation:  {
+            //     type: 'Property',
+            //     value: 0.1 * Number.parseFloat(row.fertilisation),
+            //     unitCode: 'GM'
+            // },
+            // treatments:  {
+            //     type: 'Property',
+            //     value: Number.parseFloat(row.traitement_pesticide),
+            //     unitCode: 'H09'
+            // },
+
+            // pest_presence:  {
+            //     type: 'Property',
+            //     value: (Number.parseInt(row.presence_ravageur) === 1)
+            // },
+            // access_to_training:  {
+            //     type: 'Property',
+            //     value: (Number.parseInt(row.acces_formation) === 1)
+            // },
+            //  size:  {
+            //     type: 'Property',
+            //     value: Number.parseInt(row.taille) 
+            // },
+            //  handWorked:  {
+            //     type: 'Property',
+            //     value: (Number.parseInt(row.main_oeuvre) === 1)
+            // },
+            //   yield:  {
+            //     type: 'Property',
+            //     value: 0.1 * Number.parseInt(row.rendement_kg_ha),
+            //     unitCode: 'GM'
+            // },
+            // age_of_farmer:  {
+            //     type: 'Property',
+            //     value: Number.parseInt(row.age_producteur),
+            //     unitCode: 'ANN'
+            // },
+            // experience_of_farmer:  {
+            //     type: 'Property',
+            //     value: Number.parseInt(row.experience_producteur),
+            //     unitCode: 'ANN'
+            // },
+            // handlingCount:  {
+            //     type: 'Property',
+            //     value: Number.parseInt(row.taille_menage)
+            // },
+            // childrenCount: {
+            //   type: 'Property',
+            //     value: Number.parseInt(row.nb_enfants_plus_12)
+            // },
+            // levelOfEducation: {
+            //     type: 'VocabProperty',
+            //     vocab: row.niveau_education
+            // },
+            // sex: {
+            //     type: 'VocabProperty',
+            //     vocab: row.sexe
+            // },
 
 
 
@@ -212,7 +219,7 @@ const upload = (req, res) => {
 
             batchEntities = []
             const chunkSize = 10;
-            for (let i = 0; i < 2; i += chunkSize) {
+            for (let i = 0; i < entities.length; i += chunkSize) {
                 const chunk = entities.slice(i, i + chunkSize);
                 batchEntities.push(chunk)
             }
@@ -224,12 +231,7 @@ const upload = (req, res) => {
             return createContextRequests(batchEntities);
         })
         .then(async (promises) => {
-            const results =[];
-            for (const promise of promises) {
-              const result = await promise;
-              results.push(result)
-            }
-            return results;
+            return await Promise.allSettled(promises);
         })
         .then((results) => {
             const errors = _.where(results, { status: 'rejected' });

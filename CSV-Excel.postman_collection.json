@@ -1,10 +1,44 @@
 {
 	"info": {
-		"_postman_id": "a112b97b-b130-40cc-8b92-84daf8d446ba",
+		"_postman_id": "0fba9a51-c647-4489-bb8c-e6c78223f73f",
 		"name": "CSV-Excel",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4106882"
 	},
 	"item": [
+		{
+			"name": "Uploader",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTUwOTk1OTksInN1YiI6IjIwNzkifQ.gUjQemFkCJune78K_lFckR2pl8HgdeQYIxDqDAhD7zY",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"externalUrl\": \"https://api.farmers.mahoufarm.bio/api/v1/parcels-cultures/\",\n    \"contributor\": \"ayogreen\",\n    \"model\": \"parcel\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/uploader",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"uploader"
+					]
+				}
+			},
+			"response": []
+		},
 		{
 			"name": "Upload CSV",
 			"request": {
@@ -244,15 +278,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/data-models/ngsi-context.jsonld",
+					"raw": "http://localhost:3004/user-context.jsonld",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3000",
+					"port": "3004",
 					"path": [
-						"data-models",
-						"ngsi-context.jsonld"
+						"user-context.jsonld"
 					]
 				}
 			},

@@ -13,7 +13,7 @@
     "Building": "building:Building",
     "Device": "device:Device",
     "Animal": "agrifood:Animal",
-    "AgriParcel": "agrifood:AgriParcel",
+    
     "Female": "schema:Female",
     "FillingLevelSensor": "tutorial:FillingLevelSensor",
     "Herbicide": "tutorial:Product",
@@ -152,6 +152,15 @@
     "field": "user:refTarget",
     "on": "https://w3id.org/saref#on",
     "off": "https://w3id.org/saref#off",
-    "verified": "fiware:verified"
+    "verified": "fiware:verified",
+
+
+
+    "AgriParcel": "agrifood:AgriParcel",
+    "case-agri" : "https://case-agri.com/",
+    "harvest_date": "case-agri:harvest_date",
+    "variety": "case-agri:variety"
+
+
   }
 }

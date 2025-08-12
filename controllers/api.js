@@ -102,10 +102,18 @@ async function upload(req, res) {
     //make request to api end point
     const { externalUrl, contributor, model } = req.body;
 
-    const { data } = await fetchData(externalUrl, requestToken);
-    if (!data || !Array.isArray(data) || data.length === 0) {
+    const result = await fetchData(externalUrl, requestToken);
+    let data = []
+    if (result?.data) {
+        data = result.data
+    }else{
+        data = result
+    }
+
+    if (!data) {
         return res.status(400).send({ message: 'data could not be fetched from api', data });
     }
+
     const formattedData = formatResponseData(contributor, model, externalUrl, data);
     if (!formattedData) {
         return res.status(400).send({ message: 'response could not be formatted', data });

@@ -1,4 +1,5 @@
 const Measure = require('../lib/measure');
+const moment = require('moment-timezone');
 
 async function fetchData(endpoint, requestToken) {
     try {
@@ -13,34 +14,63 @@ async function fetchData(endpoint, requestToken) {
         return null;
     }
 }
+function formatResponseRecord(entityType, idPrefix, record) {
+    const entity = {
+        type: entityType
+    };
+    for (const [k, v] of Object.entries(record)) {
+        if (v === null || v === undefined || v === '') {
+            continue;
+        }
+        if (k === 'id' || k === 'updated_at' || k === 'created_at') {
+            switch (k) {
+                case 'id':
+                    entity[k] = `${idPrefix}:${v}`;
+                    break;
+                default:
+                    entity[k] = v;
+            }
+            continue;
+        }
+        entity[k] = {
+            type: 'Property',
+            value: v
+        };
+    }
+    entity["createdAt"] = new Date().toISOString()
+    return entity
+}
 function formatResponseData(contributor, model, externalUrl, data) {
     try {
         switch (contributor) {
             case 'ayogreen':
                 if (model === 'parcel') {
                     return data.map((dd) => {
-                        const entity = {
-                            type: 'AgriParcel'
-                        };
-                        for (const [k, v] of Object.entries(dd)) {
-                            if (v === null || v === undefined || v === '') {
-                                continue;
-                            }
-                            if (k === 'id' || k === 'updated_at' || k === 'created_at') {
-                                switch (k) {
-                                    case 'id':
-                                        entity[k] = `urn:ngsi-ld:AgriParcel:${v}`;
-                                        break;
-                                    default:
-                                        entity[k] = v;
-                                }
-                                continue;
-                            }
-                            entity[k] = {
+                        const entity = formatResponseRecord('AgriParcel', 'urn:ngsi-ld:AgriParcel', dd)
+                        return {
+                            ...entity,
+                            seeAlso: {
                                 type: 'Property',
-                                value: v
-                            };
-                        }
+                                value: [externalUrl]
+                            }
+                        };
+                    });
+                }
+                if (model === 'weather') {
+                    return data.map((dd) => {
+                        const entity = formatResponseRecord('WeatherObserved', 'urn:ngsi-ld:WeatherObserved', dd)
+                        return {
+                            ...entity,
+                            seeAlso: {
+                                type: 'Property',
+                                value: [externalUrl]
+                            }
+                        };
+                    });
+                }
+                if (model === 'crop') {
+                    return data.map((dd) => {
+                        const entity = formatResponseRecord('AgriCrop', 'urn:ngsi-ld:AgriCrop', dd)
                         return {
                             ...entity,
                             seeAlso: {

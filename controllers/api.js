@@ -37,7 +37,7 @@ function formatResponseRecord(entityType, idPrefix, record) {
             value: v
         };
     }
-    entity["createdAt"] = new Date().toISOString()
+    //entity["createdAt"] = new Date().toISOString()
     return entity
 }
 function formatResponseData(contributor, model, externalUrl, data) {

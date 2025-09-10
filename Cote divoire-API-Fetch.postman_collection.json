@@ -1,0 +1,80 @@
+{
+	"info": {
+		"_postman_id": "aff1acba-6ddd-4ba6-b97d-e492e5939c26",
+		"name": "API-Fetch",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46811203"
+	},
+	"item": [
+		{
+			"name": "Upload from API",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTgyMDYzODcsInN1YiI6IjIwNzkifQ.DNC06lyJFVM0uNnnNVubInkKaCk1ILbMaaIhEH3Dspo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"externalUrl\": \"https://api.farmers.mahoufarm.bio/api/v1/categories/\",\n    \"contributor\": \"ayogreen\",\n    \"model\": \"AgriParcel\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/uploader",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"uploader"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access Token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"+233551589066\",\n  \"password\": \"ayogreen\",\n  \"role\": \"farmer\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.farmers.mahoufarm.bio/api/v1/login/access-token",
+					"protocol": "https",
+					"host": [
+						"api",
+						"farmers",
+						"mahoufarm",
+						"bio"
+					],
+					"path": [
+						"api",
+						"v1",
+						"login",
+						"access-token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

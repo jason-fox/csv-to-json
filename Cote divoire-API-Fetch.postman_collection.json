@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "aff1acba-6ddd-4ba6-b97d-e492e5939c26",
+		"_postman_id": "63eddfe0-25eb-4b84-af9d-a1c89ae88cc8",
 		"name": "API-Fetch",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "46811203"
+		"_exporter_id": "4106882"
 	},
 	"item": [
 		{
@@ -75,6 +75,33 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Get Types",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{context-broker}}/ngsi-ld/v1/types",
+					"protocol": "http",
+					"host": [
+						"{{context-broker}}"
+					],
+					"path": [
+						"ngsi-ld",
+						"v1",
+						"types"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "user-context.jsonld",
+			"value": "",
+			"type": "default"
 		}
 	]
 }

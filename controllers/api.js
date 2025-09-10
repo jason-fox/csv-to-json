@@ -1,5 +1,6 @@
 const Measure = require('../lib/measure');
 const moment = require('moment-timezone');
+const debug = require('debug')('server:api');
 
 async function fetchData(endpoint, requestToken) {
     try {
@@ -80,8 +81,12 @@ function formatResponseData(contributor, model, externalUrl, data) {
                         };
                     });
                 }
+
+
+                debug(`unknown model ${model}`)
                 return null;
             default:
+                debug(`unknown contributor ${contributor}`)
                 return null;
         }
     } catch (error) {

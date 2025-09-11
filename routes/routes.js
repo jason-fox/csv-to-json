@@ -4,6 +4,13 @@ const palmController = require('../controllers/palm');
 const csvController = require('../controllers/csv');
 const excelController = require('../controllers/excel');
 const apiController = require('../controllers/api');
+
+/// Stock Market Ivory Coasr
+const citiesController = require('../controllers/csv/cities');
+const stockPriceController = require('../controllers/csv/stockprice');
+const productsController = require('../controllers/csv/products');
+
+
 const upload = require('../lib/upload');
 
 // Error Handling Helper Function
@@ -38,6 +45,31 @@ router.post(
     '/uploader',
     asyncHelper(async (req, res) => {
         await apiController.upload(req, res);
+    })
+);
+
+
+router.post(
+    '/csv/cities',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await citiesController.upload(req, res);
+    })
+);
+
+router.post(
+    '/csv/products',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await productsController.upload(req, res);
+    })
+);
+
+router.post(
+    '/csv/stockprice',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await stockPriceController.upload(req, res);
     })
 );
 

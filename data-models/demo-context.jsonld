@@ -1,0 +1,27 @@
+{
+  "@context": {
+    "type": "@type",
+    "id": "@id",
+    "schema": "https://schema.org/",
+    "case-agri": "https://case-agri.com/",
+    "City": "case-agri:City",
+    "Product": "case-agri:Product",
+    "StockPrice": "case-agri:StockPrice",
+    "category": "case-agri:category",
+    "name": "schema:name",
+    "description": "schema:description",
+    "hasStockPrice": "case-agri:hasStockPrice",
+    "price": "schema:price",
+    "subCategory": "case-agri:subCategory",
+    "unitOfMeasure": "schema:unitText",
+    "produits-vivriers": "case-agri:produits-vivriers",
+    "produits-manufactures": "case-agri:produits-manufactures",
+    "produits-frais": "case-agri:produits-frais",
+    "produits-hors-saison": "case-agri:produits-hors-saison",
+    "produits-de-saison": "case-agri:produits-de-saison",
+    "fruits": "case-agri:fruits",
+    "divers": "case-agri:divers",
+    "boucherie": "case-agri:boucherie",
+    "poissonnerie": "case-agri:poissonnerie"
+  }
+}

@@ -11,7 +11,7 @@
     "nom": "schema:name",
     "description": "schema:description",
     "aPrixActione": "case-agri:hasStockPrice",
-    "pix": "schema:price",
+    "prix": "schema:price",
     "sousCategorie": "case-agri:subCategory",
     "uniteDeMeasure": "schema:unitText",
     "produits-vivriers": "case-agri:produits-vivriers",

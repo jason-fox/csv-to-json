@@ -10,6 +10,8 @@ const citiesController = require('../controllers/csv/cities');
 const stockPriceController = require('../controllers/csv/stockprice');
 const productsController = require('../controllers/csv/products');
 
+const wikiController = require('../controllers/csv/cities-wiki');
+
 
 const upload = require('../lib/upload');
 
@@ -54,6 +56,14 @@ router.post(
     upload.single('file'),
     asyncHelper(async (req, res) => {
         await citiesController.upload(req, res);
+    })
+);
+
+router.post(
+    '/csv/wiki',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await wikiController.upload(req, res);
     })
 );
 

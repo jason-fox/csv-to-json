@@ -22,6 +22,8 @@
     "fruits": "case-agri:fruits",
     "divers": "case-agri:divers",
     "boucherie": "case-agri:boucherie",
-    "poissonnerie": "case-agri:poissonnerie"
+    "poissonnerie": "case-agri:poissonnerie",
+    "region": "schema:addressRegion",
+    "population": "case-agri:addressRegion"
   }
 }

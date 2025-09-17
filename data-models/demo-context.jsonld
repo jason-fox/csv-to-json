@@ -24,6 +24,6 @@
     "boucherie": "case-agri:boucherie",
     "poissonnerie": "case-agri:poissonnerie",
     "region": "schema:addressRegion",
-    "population": "case-agri:addressRegion"
+    "population": "case-agri:population"
   }
 }

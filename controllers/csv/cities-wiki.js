@@ -90,8 +90,6 @@ function createEntitiesFromRows(rows) {
         };
         allEntities.push(entity);
     });
-
-    console.log(allEntities)
     return allEntities;
 }
 

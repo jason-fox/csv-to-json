@@ -14,6 +14,7 @@ const wikiController = require('../controllers/csv/cities-wiki');
 
 const debutController = require('../controllers/excel/start-end');
 const decadaireController = require('../controllers/excel/decadaire');
+const decadaireSodexamController = require('../controllers/excel/decadaire-sodexam');
 
 const upload = require('../lib/upload');
 
@@ -97,6 +98,14 @@ router.post(
     upload.single('file'),
     asyncHelper(async (req, res) => {
         await decadaireController.upload(req, res);
+    })
+);
+
+router.post(
+    '/excel/decadaire-sodexam',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await decadaireSodexamController.upload(req, res);
     })
 );
 

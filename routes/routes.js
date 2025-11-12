@@ -13,6 +13,9 @@ const productsController = require('../controllers/csv/products');
 const wikiController = require('../controllers/csv/cities-wiki');
 
 
+const debutController = require('../controllers/excel/start-end');
+
+
 const upload = require('../lib/upload');
 
 // Error Handling Helper Function
@@ -82,5 +85,14 @@ router.post(
         await stockPriceController.upload(req, res);
     })
 );
+
+router.post(
+    '/excel/start-end/:sheet',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await debutController.upload(req, res);
+    })
+);
+
 
 module.exports = router;

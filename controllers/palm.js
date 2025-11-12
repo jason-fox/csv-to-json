@@ -6,7 +6,6 @@ const _ = require('underscore');
 const Status = require('http-status-codes');
 const moment = require('moment-timezone');
 
-
 /*
  * Delete the temporary file
  */
@@ -40,8 +39,6 @@ function readCsvFile(path) {
     });
 }
 
-
-
 /*
  *  Strip the id and an key from the header row.
  */
@@ -58,13 +55,12 @@ function createEntitiesFromRows(rows) {
     const allEntities = [];
 
     rows.forEach((row, index) => {
-        const timestamp = moment.tz(row.annee, 'Etc/UTC').toISOString() 
+        const timestamp = moment.tz(row.annee, 'Etc/UTC').toISOString();
         const entity = {
+            id: 'urn:ngsi-ld:AgriParcel:' + row.ID.toLowerCase(),
+            type: 'AgriParcel',
 
-             id: 'urn:ngsi-ld:AgriParcel:' + row.ID.toLowerCase(),
-             type: 'AgriParcel',
-
-            region:  {
+            region: {
                 type: 'Property',
                 value: row.REGION
             },
@@ -79,11 +75,10 @@ function createEntitiesFromRows(rows) {
             location: {
                 type: 'GeoProperty',
                 value: {
-                     type: 'Point',
-                     coordinates: [13.3505, 52.5144]
+                    type: 'Point',
+                    coordinates: [13.3505, 52.5144]
                 }
-            },
-
+            }
 
             // slope:  {
             //     type: 'Property',
@@ -131,7 +126,7 @@ function createEntitiesFromRows(rows) {
             // },
             //  size:  {
             //     type: 'Property',
-            //     value: Number.parseInt(row.taille) 
+            //     value: Number.parseInt(row.taille)
             // },
             //  handWorked:  {
             //     type: 'Property',
@@ -168,23 +163,15 @@ function createEntitiesFromRows(rows) {
             //     type: 'VocabProperty',
             //     vocab: row.sexe
             // },
-
-
-
-
-
-
-
         };
 
         Object.keys(entity).forEach((key, index) => {
-        if (key === 'id') {
-        } else if (key === 'type') {
-        } else {
-            entity[key].observedAt = timestamp;
-        }
-    });
-
+            if (key === 'id') {
+            } else if (key === 'type') {
+            } else {
+                entity[key].observedAt = timestamp;
+            }
+        });
 
         allEntities.push(entity);
     });
@@ -221,13 +208,13 @@ const upload = (req, res) => {
             return createEntitiesFromRows(rows);
         })
         .then((entities) => {
-            console.log(JSON.stringify(entities[0], null, 2))
+            console.log(JSON.stringify(entities[0], null, 2));
 
-            batchEntities = []
+            batchEntities = [];
             const chunkSize = 10;
             for (let i = 0; i < entities.length; i += chunkSize) {
                 const chunk = entities.slice(i, i + chunkSize);
-                batchEntities.push(chunk)
+                batchEntities.push(chunk);
             }
             // for (let i = 0; i < entities.length; i += chunkSize) {
             //     const chunk = entities.slice(i, i + chunkSize);

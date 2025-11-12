@@ -6,7 +6,6 @@ const _ = require('underscore');
 const Status = require('http-status-codes');
 const moment = require('moment-timezone');
 
-
 /*
  * Delete the temporary file
  */
@@ -19,10 +18,7 @@ function removeCsvFile(path) {
 }
 
 function toTitleCase(str) {
-  return str.replace(
-    /\w\S*/g,
-    text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
-  );
+    return str.replace(/\w\S*/g, (text) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase());
 }
 
 /*
@@ -47,38 +43,37 @@ function readCsvFile(path) {
     });
 }
 
-
-
-function clean(str){
+function clean(str) {
     str = str.trim();
-    return toBracket(str.replace(/\s+/g, '-').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        )
+    return toBracket(
+        str
+            .replace(/\s+/g, '-')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+    );
 }
 
 function toBracket(str) {
-    
     const match = str.match(/\(/);
-    if(match)
-    {
-        return str.substring(0, match.index-1).trim();
+    if (match) {
+        return str.substring(0, match.index - 1).trim();
     }
     return str;
 }
-
 
 function createEntitiesFromRows(rows) {
     const allEntities = [];
 
     rows.forEach((row) => {
-        const timestamp = moment.tz(row.DATE, 'Etc/UTC').toISOString() 
-        const id= `${clean(row.VILLE)}-${clean(row.PRODUITS)}`;
-        if (row.PRIX){
+        const timestamp = moment.tz(row.DATE, 'Etc/UTC').toISOString();
+        const id = `${clean(row.VILLE)}-${clean(row.PRODUITS)}`;
+        if (row.PRIX) {
             const entity = {
                 id: `urn:ngsi-ld:StockPrice:${id}`,
                 type: 'StockPrice',
-                description: {type: 'Property', value: `${toTitleCase(row.VILLE)}: ${toTitleCase(row.PRODUITS)}`},
-                price: {type: 'Property', value: Number(row.PRIX), unitCode: 'CFA', observedAt: timestamp}
-
+                description: { type: 'Property', value: `${toTitleCase(row.VILLE)}: ${toTitleCase(row.PRODUITS)}` },
+                price: { type: 'Property', value: Number(row.PRIX), unitCode: 'CFA', observedAt: timestamp }
             };
             allEntities.push(entity);
         }
@@ -115,23 +110,23 @@ const upload = (req, res) => {
             return createEntitiesFromRows(rows);
         })
         .then((entities) => {
-            console.log(JSON.stringify(entities[0], null, 2))
+            //console.log(JSON.stringify(entities[0], null, 2));
 
-            batchEntities = []
-            const chunkSize = 50;
-           
+            batchEntities = [];
+            const chunkSize = 100;
+
             for (let i = 0; i < entities.length; i += chunkSize) {
-                 const chunk = entities.slice(i, i + chunkSize);
-                 batchEntities.push(chunk)
+                const chunk = entities.slice(i, i + chunkSize);
+                batchEntities.push(chunk);
             }
 
             return createContextRequests(batchEntities);
         })
         .then(async (promises) => {
-            const results =[];
+            const results = [];
             for (const promise of promises) {
-              const result = await promise;
-              results.push(result)
+                const result = await promise;
+                results.push(result);
             }
             return results;
         })

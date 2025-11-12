@@ -12,9 +12,8 @@ const productsController = require('../controllers/csv/products');
 
 const wikiController = require('../controllers/csv/cities-wiki');
 
-
 const debutController = require('../controllers/excel/start-end');
-
+const decadaireController = require('../controllers/excel/decadaire');
 
 const upload = require('../lib/upload');
 
@@ -52,7 +51,6 @@ router.post(
         await apiController.upload(req, res);
     })
 );
-
 
 router.post(
     '/csv/cities',
@@ -94,5 +92,12 @@ router.post(
     })
 );
 
+router.post(
+    '/excel/decadaire',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await decadaireController.upload(req, res);
+    })
+);
 
 module.exports = router;

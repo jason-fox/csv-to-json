@@ -39,7 +39,7 @@ function formatResponseRecord(entityType, idPrefix, record) {
         };
     }
     //entity["createdAt"] = new Date().toISOString()
-    return entity
+    return entity;
 }
 function formatResponseData(contributor, model, externalUrl, data) {
     try {
@@ -47,7 +47,7 @@ function formatResponseData(contributor, model, externalUrl, data) {
             case 'ayogreen':
                 if (model === 'parcel') {
                     return data.map((dd) => {
-                        const entity = formatResponseRecord('AgriParcel', 'urn:ngsi-ld:AgriParcel', dd)
+                        const entity = formatResponseRecord('AgriParcel', 'urn:ngsi-ld:AgriParcel', dd);
                         return {
                             ...entity,
                             seeAlso: {
@@ -59,7 +59,7 @@ function formatResponseData(contributor, model, externalUrl, data) {
                 }
                 if (model === 'weather') {
                     return data.map((dd) => {
-                        const entity = formatResponseRecord('WeatherObserved', 'urn:ngsi-ld:WeatherObserved', dd)
+                        const entity = formatResponseRecord('WeatherObserved', 'urn:ngsi-ld:WeatherObserved', dd);
                         return {
                             ...entity,
                             seeAlso: {
@@ -71,7 +71,7 @@ function formatResponseData(contributor, model, externalUrl, data) {
                 }
                 if (model === 'crop') {
                     return data.map((dd) => {
-                        const entity = formatResponseRecord('AgriCrop', 'urn:ngsi-ld:AgriCrop', dd)
+                        const entity = formatResponseRecord('AgriCrop', 'urn:ngsi-ld:AgriCrop', dd);
                         return {
                             ...entity,
                             seeAlso: {
@@ -82,11 +82,10 @@ function formatResponseData(contributor, model, externalUrl, data) {
                     });
                 }
 
-
-                debug(`unknown model ${model}`)
+                debug(`unknown model ${model}`);
                 return null;
             default:
-                debug(`unknown contributor ${contributor}`)
+                debug(`unknown contributor ${contributor}`);
                 return null;
         }
     } catch (error) {
@@ -94,7 +93,6 @@ function formatResponseData(contributor, model, externalUrl, data) {
         return null;
     }
 }
-
 
 /**
  * Actions when uploading a API. The API holds an array of
@@ -108,11 +106,11 @@ async function upload(req, res) {
     const { externalUrl, contributor, model } = req.body;
 
     const result = await fetchData(externalUrl, requestToken);
-    let data = []
+    let data = [];
     if (result?.data) {
-        data = result.data
-    }else{
-        data = result
+        data = result.data;
+    } else {
+        data = result;
     }
 
     if (!data) {

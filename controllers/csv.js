@@ -6,7 +6,6 @@ const _ = require('underscore');
 const Status = require('http-status-codes');
 const moment = require('moment-timezone');
 
-
 /*
  * Delete the temporary file
  */
@@ -40,8 +39,6 @@ function readCsvFile(path) {
     });
 }
 
-
-
 /*
  *  Strip the id and an key from the header row.
  */
@@ -58,93 +55,92 @@ function createEntitiesFromRows(rows) {
     const allEntities = [];
 
     rows.forEach((row) => {
-        const timestamp = moment.tz(row.annee, 'Etc/UTC').toISOString() 
+        const timestamp = moment.tz(row.annee, 'Etc/UTC').toISOString();
         const entity = {
-
-             id: 'urn:ngsi-ld:AgriParcel:' +row.parcelle_id.toLowerCase(),
-             type: 'AgriParcel',
+            id: 'urn:ngsi-ld:AgriParcel:' + row.parcelle_id.toLowerCase(),
+            type: 'AgriParcel',
             variety: {
                 type: 'VocabProperty',
                 vocab: row.variete
             },
-            altitude:  {
+            altitude: {
                 type: 'Property',
                 value: Number.parseFloat(row.altitude),
                 unitCode: 'MTR'
             },
-            slope:  {
+            slope: {
                 type: 'Property',
                 value: Number.parseFloat(row.pente),
                 unitCode: 'DD'
             },
-            soil_acidity:  {
+            soil_acidity: {
                 type: 'Property',
                 value: Number.parseFloat(row.ph_sol),
                 unitCode: 'Q30'
             },
-            rainfall:  {
+            rainfall: {
                 type: 'Property',
                 value: Number.parseFloat(row.pluie),
                 unitCode: 'MMT'
             },
-            temperature:  {
+            temperature: {
                 type: 'Property',
                 value: Number.parseFloat(row.temperature),
                 unitCode: 'CEL'
             },
-            age:  {
+            age: {
                 type: 'Property',
                 value: Number.parseFloat(row.age_arbre),
                 unitCode: 'ANN'
             },
-             fertilisation:  {
+            fertilisation: {
                 type: 'Property',
                 value: 0.1 * Number.parseFloat(row.fertilisation),
                 unitCode: 'GM'
             },
-            treatments:  {
+            treatments: {
                 type: 'Property',
                 value: Number.parseFloat(row.traitement_pesticide),
                 unitCode: 'H09'
             },
 
-            pest_presence:  {
+            pest_presence: {
                 type: 'Property',
-                value: (Number.parseInt(row.presence_ravageur) === 1)
+                value: Number.parseInt(row.presence_ravageur) === 1
             },
-            access_to_training:  {
+            access_to_training: {
                 type: 'Property',
-                value: (Number.parseInt(row.acces_formation) === 1)
+                value: Number.parseInt(row.acces_formation) === 1
             },
-             size:  {
+            size: {
                 type: 'Property',
-                value: Number.parseInt(row.taille) 
+                value: Number.parseInt(row.taille)
             },
-             handWorked:  {
+            handWorked: {
                 type: 'Property',
-                value: (Number.parseInt(row.main_oeuvre) === 1)
+                value: Number.parseInt(row.main_oeuvre) === 1
             },
-              yield:  {
+            yield: {
                 type: 'Property',
                 value: 0.1 * Number.parseInt(row.rendement_kg_ha),
                 unitCode: 'GM'
             },
-            age_of_farmer:  {
+            age_of_farmer: {
                 type: 'Property',
                 value: Number.parseInt(row.age_producteur),
                 unitCode: 'ANN'
             },
-            experience_of_farmer:  {
+            experience_of_farmer: {
                 type: 'Property',
                 value: Number.parseInt(row.experience_producteur),
                 unitCode: 'ANN'
             },
-            handlingCount:  {
+            handlingCount: {
                 type: 'Property',
                 value: Number.parseInt(row.taille_menage)
             },
             childrenCount: {
-              type: 'Property',
+                type: 'Property',
                 value: Number.parseInt(row.nb_enfants_plus_12)
             },
             levelOfEducation: {
@@ -154,24 +150,16 @@ function createEntitiesFromRows(rows) {
             sex: {
                 type: 'VocabProperty',
                 vocab: row.sexe
-            },
-
-
-
-
-
-
-
+            }
         };
 
         Object.keys(entity).forEach((key, index) => {
-        if (key === 'id') {
-        } else if (key === 'type') {
-        } else {
-            entity[key].observedAt = timestamp;
-        }
-    });
-
+            if (key === 'id') {
+            } else if (key === 'type') {
+            } else {
+                entity[key].observedAt = timestamp;
+            }
+        });
 
         allEntities.push(entity);
     });
@@ -208,13 +196,13 @@ const upload = (req, res) => {
             return createEntitiesFromRows(rows);
         })
         .then((entities) => {
-            console.log(JSON.stringify(entities[0], null, 2))
+            //console.log(JSON.stringify(entities[0], null, 2));
 
-            batchEntities = []
+            batchEntities = [];
             const chunkSize = 10;
             for (let i = 0; i < 2; i += chunkSize) {
                 const chunk = entities.slice(i, i + chunkSize);
-                batchEntities.push(chunk)
+                batchEntities.push(chunk);
             }
             // for (let i = 0; i < entities.length; i += chunkSize) {
             //     const chunk = entities.slice(i, i + chunkSize);
@@ -224,10 +212,10 @@ const upload = (req, res) => {
             return createContextRequests(batchEntities);
         })
         .then(async (promises) => {
-            const results =[];
+            const results = [];
             for (const promise of promises) {
-              const result = await promise;
-              results.push(result)
+                const result = await promise;
+                results.push(result);
             }
             return results;
         })

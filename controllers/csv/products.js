@@ -6,7 +6,6 @@ const _ = require('underscore');
 const Status = require('http-status-codes');
 const moment = require('moment-timezone');
 
-
 /*
  * Delete the temporary file
  */
@@ -19,24 +18,24 @@ function removeCsvFile(path) {
 }
 
 function toTitleCase(str) {
-  return str.replace(
-    /\w\S*/g,
-    text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
-  );
+    return str.replace(/\w\S*/g, (text) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase());
 }
 
-function clean(str){
-    str = str.trim()
-    return toBracket(str.replace(/\s+/g, '-').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        )
+function clean(str) {
+    str = str.trim();
+    return toBracket(
+        str
+            .replace(/\s+/g, '-')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+    );
 }
 
 function toBracket(str) {
-    
     const match = str.match(/\(/);
-    if(match)
-    {
-        return str.substring(0, match.index-1).trim();
+    if (match) {
+        return str.substring(0, match.index - 1).trim();
     }
     return str;
 }
@@ -63,36 +62,34 @@ function readCsvFile(path) {
     });
 }
 
-
 function createEntitiesFromRows(rows) {
     const allEntities = [];
     const hasStocks = {};
 
     rows.forEach((row) => {
-        const id= clean(row.PRODUITS)
+        const id = clean(row.PRODUITS);
         const stockId = `urn:ngsi-ld:StockPrice:${clean(row.VILLE)}-${clean(row.PRODUITS)}`;
 
-        if (hasStocks[id]){
-            if (! hasStocks[id].includes(stockId)){
+        if (hasStocks[id]) {
+            if (!hasStocks[id].includes(stockId)) {
                 hasStocks[id].push(stockId);
-            } 
+            }
         } else {
-            hasStocks[id]= [stockId];
+            hasStocks[id] = [stockId];
         }
     });
 
-
     rows.forEach((row) => {
-        const id = clean(row.PRODUITS)
-        const timestamp = moment.tz(row.DATE, 'Etc/UTC').toISOString() 
+        const id = clean(row.PRODUITS);
+        const timestamp = moment.tz(row.DATE, 'Etc/UTC').toISOString();
         const entity = {
             id: `urn:ngsi-ld:Product:${id}`,
             type: 'Product',
-            name: {type: 'Property', value: toTitleCase(row.PRODUITS)},
-            subCategory: {type: 'VocabProperty', vocab: clean(row["SOUS-CATEGORIE"])},
-            unitOfMeasure: {type: 'Property', value: toTitleCase(row.UNITE)},
-            category: {type: 'VocabProperty', vocab: clean(row["CATEGORIE"])},
-             hasStockPrice: { type: 'Relationship', object: hasStocks[id]}
+            name: { type: 'Property', value: toTitleCase(row.PRODUITS) },
+            subCategory: { type: 'VocabProperty', vocab: clean(row['SOUS-CATEGORIE']) },
+            unitOfMeasure: { type: 'Property', value: toTitleCase(row.UNITE) },
+            category: { type: 'VocabProperty', vocab: clean(row['CATEGORIE']) },
+            hasStockPrice: { type: 'Relationship', object: hasStocks[id] }
         };
         allEntities.push(entity);
     });
@@ -129,22 +126,21 @@ const upload = (req, res) => {
             return createEntitiesFromRows(rows);
         })
         .then((entities) => {
-           
             batchEntities = [];
-            const chunkSize = 50;
-           
+            const chunkSize = 100;
+
             for (let i = 0; i < entities.length; i += chunkSize) {
-                 const chunk = entities.slice(i, i + chunkSize);
-                 batchEntities.push(chunk)
+                const chunk = entities.slice(i, i + chunkSize);
+                batchEntities.push(chunk);
             }
 
             return createContextRequests(batchEntities);
         })
         .then(async (promises) => {
-            const results =[];
+            const results = [];
             for (const promise of promises) {
-              const result = await promise;
-              results.push(result)
+                const result = await promise;
+                results.push(result);
             }
             return results;
         })

@@ -38,61 +38,52 @@ function removeXlsxFile(path) {
  */
 function createEntitiesFromXlsx(rows, sheet) {
     const entities = [];
-
-    const stations = rows[0];
-    const lats = rows[1];
-    const lngs = rows[2];
-
-    stations.shift();
-    lats.shift();
-    lngs.shift();
-
-    for (var i = 4; i < rows.length; i++) {
+    for (var i = 1; i < rows.length; i++) {
         const data = rows[i];
         if (!!data[0]) {
-            const timestamp = moment.tz(`${data[0]}-01-01`, 'Etc/UTC').toISOString();
-            data.shift();
+            const city = data[0];
+            const year = data[1];
+            const month = data[2];
 
-            data.forEach((reading, index) => {
-                if (!!reading) {
-                    const city = clean(stations[index]);
-                    const lat = lats[index];
-                    const lng = lngs[index];
-                    const id = `urn:ngsi-ld:City:${city.toLowerCase()}`;
-                    const obj = {
-                        id,
-                        type: 'City',
-                        name: {
-                            type: 'Property',
-                            value: toTitleCase(city)
-                        },
-                        location: {
-                            type: 'GeoProperty',
-                            value: {
-                                type: 'Point',
-                                coordinates: [Number(lng), Number(lat)]
-                            }
-                        }
-                    };
+            const timestamp = moment.tz(`${data[1]}-${data[2]}-01`, 'Etc/UTC').toISOString();
 
-                    if (sheet === 1) {
-                        obj.startDate = {
-                            type: 'Property',
-                            value: reading,
-                            observedAt: timestamp
-                        };
-                    }
-                    if (sheet === 2) {
-                        obj.endDate = {
-                            type: 'Property',
-                            value: reading,
-                            observedAt: timestamp
-                        };
-                    }
+            const etf1 = data[4];
+            const etf2 = data[5];
+            const etf3 = data[6];
+            const etf4 = data[7];
 
-                    entities.push(obj);
+            console.log(city, etf1, etf2, etf3, etf4, timestamp);
+
+            const id = `urn:ngsi-ld:City:${city.toLowerCase()}`;
+            const obj = {
+                id,
+                type: 'City',
+                name: {
+                    type: 'Property',
+                    value: toTitleCase(city)
+                },
+                etf1: {
+                    type: 'Property',
+                    value: Number(etf1),
+                    observedAt: timestamp
+                },
+                etf2: {
+                    type: 'Property',
+                    value: Number(etf2),
+                    observedAt: timestamp
+                },
+                etf3: {
+                    type: 'Property',
+                    value: Number(etf3),
+                    observedAt: timestamp
+                },
+                etf4: {
+                    type: 'Property',
+                    value: Number(etf4),
+                    observedAt: timestamp
                 }
-            });
+            };
+            entities.push(obj);
         } else {
             break;
         }

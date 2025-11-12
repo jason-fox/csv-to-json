@@ -12,6 +12,7 @@ const productsController = require('../controllers/csv/products');
 
 const wikiController = require('../controllers/csv/cities-wiki');
 
+const averageWeatherController = require('../controllers/excel/average-weather');
 const debutController = require('../controllers/excel/start-end');
 const decadaireController = require('../controllers/excel/decadaire');
 const decadaireSodexamController = require('../controllers/excel/decadaire-sodexam');
@@ -90,6 +91,14 @@ router.post(
     upload.single('file'),
     asyncHelper(async (req, res) => {
         await debutController.upload(req, res);
+    })
+);
+
+router.post(
+    '/excel/average-weather/:sheet',
+    upload.single('file'),
+    asyncHelper(async (req, res) => {
+        await averageWeatherController.upload(req, res);
     })
 );
 

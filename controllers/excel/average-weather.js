@@ -55,10 +55,19 @@ function createEntitiesFromXlsx(rows, city) {
         const data = rows[i];
         const header = data[0];
         data.shift();
+        const monthly = [];
+
+        data.slice(0, 11).forEach((value)=>{
+            monthly.push( +(value).toFixed(1));
+        });
 
         obj[clean(header)] = {
             type: 'ListProperty',
-            valueList: data
+            valueList: monthly
+        };
+        obj[`average-${clean(header)}`] = {
+            type: 'Property',
+            value:  +((data[12]).toFixed(1))  //data[12]
         };
     }
 
@@ -66,10 +75,15 @@ function createEntitiesFromXlsx(rows, city) {
         const data = rows[i];
         const header = data[0];
         data.shift();
+        const monthly = [];
+
+        data.slice(0, 11).forEach((value)=>{
+            monthly.push( +(value).toFixed(1));
+        });
 
         obj[clean(header)] = {
             type: 'ListProperty',
-            valueList: data
+            valueList: monthly
         };
     }
     return [obj];
@@ -84,7 +98,6 @@ const upload = (req, res) => {
     const sheet = req.params.sheet ? Number(req.params.sheet) : 1;
     let cities;
 
-    console.log(readSheetNames);
     return readSheetNames(path)
         .then((sheetNames) => {
             console.log(sheetNames);

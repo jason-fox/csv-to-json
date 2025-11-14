@@ -34,6 +34,26 @@ function removeXlsxFile(path) {
     });
 }
 
+function addUnitCode(target, attr) {
+    switch (attr) {
+        case 'tmax-moyenne':
+            target.unitCode = 'CEL';
+            break;
+        case 'tmini-moyenne':
+            target.unitCode = 'CEL';
+            break;
+        case 'umax-moyenne':
+            target.unitCode = 'P1';
+            break;
+        case 'umini-moyenne':
+            target.unitCode = 'P1';
+            break;
+        case 'u-moyenne':
+            target.unitCode = 'P1';
+            break;
+    }
+}
+
 /*
  * Manipulate the Excel data to create a series of entities
  */
@@ -57,18 +77,20 @@ function createEntitiesFromXlsx(rows, city) {
         data.shift();
         const monthly = [];
 
-        data.slice(0, 11).forEach((value)=>{
-            monthly.push( +(value).toFixed(1));
+        data.slice(0, 11).forEach((value) => {
+            monthly.push(+value.toFixed(1));
         });
-
-        obj[clean(header)] = {
+        const attr = clean(header);
+        obj[attr] = {
             type: 'ListProperty',
             valueList: monthly
         };
-        obj[`average-${clean(header)}`] = {
+        addUnitCode(obj[attr], attr);
+        obj[`average-${attr}`] = {
             type: 'Property',
-            value:  +((data[12]).toFixed(1))  //data[12]
+            value: +data[12].toFixed(1) //data[12]
         };
+        addUnitCode(obj[`average-${attr}`], attr);
     }
 
     for (var i = 14; i < 15; i++) {
@@ -77,13 +99,14 @@ function createEntitiesFromXlsx(rows, city) {
         data.shift();
         const monthly = [];
 
-        data.slice(0, 11).forEach((value)=>{
-            monthly.push( +(value).toFixed(1));
+        data.slice(0, 11).forEach((value) => {
+            monthly.push(+value.toFixed(1));
         });
 
         obj[clean(header)] = {
             type: 'ListProperty',
-            valueList: monthly
+            valueList: monthly,
+            unitCode: 'MMT'
         };
     }
     return [obj];

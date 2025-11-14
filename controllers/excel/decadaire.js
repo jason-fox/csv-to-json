@@ -64,23 +64,27 @@ function createEntitiesFromXlsx(rows, sheet) {
                 },
                 etf1: {
                     type: 'Property',
-                    value: Number(etf1),
-                    observedAt: timestamp
+                    value: +eft1.toFixed(2),
+                    observedAt: timestamp,
+                    unitCode: 'MMT'
                 },
                 etf2: {
                     type: 'Property',
-                    value: Number(etf2),
-                    observedAt: timestamp
+                    value: +eft2.toFixed(2),
+                    observedAt: timestamp,
+                    unitCode: 'MMT'
                 },
                 etf3: {
                     type: 'Property',
-                    value: Number(etf3),
-                    observedAt: timestamp
+                    value: +eft3.toFixed(2),
+                    observedAt: timestamp,
+                    unitCode: 'MMT'
                 },
                 etf4: {
                     type: 'Property',
-                    value: Number(etf4),
-                    observedAt: timestamp
+                    value: +eft4.toFixed(2),
+                    observedAt: timestamp,
+                    unitCode: 'MMT'
                 }
             };
             entities.push(obj);

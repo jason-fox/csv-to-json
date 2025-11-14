@@ -66,11 +66,16 @@ function createEntitiesFromXlsx(rows, sheet) {
 
             for (var j = 4; j < data.length; j++) {
                 if (!!data[j]) {
-                    obj[header[j].toLowerCase()] = {
+                    const attr = header[j].toLowerCase();
+                    obj[attr] = {
                         type: 'Property',
-                        value: Number(data[j]),
+                        value: +data[j].toFixed(2),
                         observedAt: timestamp
                     };
+
+                    if (attr.startsWith('decade')) {
+                        obj[attr].unitCode = 'MMT';
+                    }
                 }
             }
             entities.push(obj);

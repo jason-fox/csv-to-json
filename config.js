@@ -3,7 +3,7 @@ const config = {
     contextBroker: {
         host: 'localhost',
         port: '1026',
-        jsonLdContext: 'http://context/user-context.jsonld'
+        jsonLdContext: 'http://context/demo-context.jsonld'
     },
     replace: {
         'position(km)': 'position',

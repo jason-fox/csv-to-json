@@ -1,0 +1,30 @@
+id,type,jobTitle_name,name,owns,gender,telephone,locationCity,createdAt
+urn:ngsi-ld:Person:person74,Person,manager,Jerome Kouakou,,Male,,Abidjan,
+urn:ngsi-ld:Person:person140,Person,farmer,Koffi Oscar Loukou,"urn:ngsi-ld:AgriParcel:003; 
+urn:ngsi-ld:AgriParcel:002; 
+urn:ngsi-ld:AgriParcel:001",Male,,Galebre,
+urn:ngsi-ld:Person:person141,Person,farmer,Kouadio Yao,,Male,,Galebre,
+urn:ngsi-ld:Person:person142,Person,farmer,Koffi Sahoure,"urn:ngsi-ld:AgriParcel:006; 
+urn:ngsi-ld:AgriParcel:005; 
+urn:ngsi-ld:AgriParcel:004",Male,,Galebre,
+urn:ngsi-ld:Person:person143,Person,farmer,Konan Djaha,,Male,,Galebre,
+urn:ngsi-ld:Person:person144,Person,farmer,Kouba Alexis Gnahore,,Male,,Galebre,
+urn:ngsi-ld:Person:person145,Person,farmer,Aladare Kone,,Male,,Galebre,
+urn:ngsi-ld:Person:person146,Person,farmer,N'da Kone,,Female,,Galebre,
+urn:ngsi-ld:Person:person147,Person,farmer,Kouadio Roger Yao,,Male,,Galebre,
+urn:ngsi-ld:Person:person148,Person,farmer,N'guessan Ruphin Yao,,Male,,Galebre,
+urn:ngsi-ld:Person:person149,Person,farmer,Mana Sylvain Bleka,,Female,,Galebre,
+urn:ngsi-ld:Person:person150,Person,farmer,Konan Emmanuel Konan,,Male,,Galebre,
+urn:ngsi-ld:Person:person151,Person,farmer,Yao Prosper Konan,,Male,,Galebre,
+urn:ngsi-ld:Person:person152,Person,farmer,Hikiemé Ouellet Prosper Toure,,Male,,Galebre,
+urn:ngsi-ld:Person:person153,Person,farmer,Koffi Alphonse Kouadio,,Male,,Galebre,
+urn:ngsi-ld:Person:person154,Person,farmer,Kouassi Sylvain Kouakou,,Male,,Galebre,
+urn:ngsi-ld:Person:person155,Person,farmer,Konan François Kouassi,,Male,,Galebre,
+urn:ngsi-ld:Person:person156,Person,farmer,Koffi Adrien Konan,,Male,,Galebre,
+urn:ngsi-ld:Person:person157,Person,farmer,Serehion Fofana,,Male,,Galebre,
+urn:ngsi-ld:Person:person158,Person,farmer,Yao Michel Konan,,Male,,Galebre,
+urn:ngsi-ld:Person:person159,Person,farmer,Kouame Attugbre,,Male,,Galebre,
+urn:ngsi-ld:Person:person160,Person,farmer,N'klo Moro,,Male,,Galebre,
+urn:ngsi-ld:Person:person161,Person,farmer,Siaka Coulibaly,,Male,,Galebre,
+urn:ngsi-ld:Person:person162,Person,farmer,François Kabore,,Male,,Galebre,
+urn:ngsi-ld:Person:person163,Person,farmer,N'guessan Serge Kouadio,,Male,,Galebre,
